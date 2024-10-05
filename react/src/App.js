@@ -1,5 +1,5 @@
 import './App.css';
-import RaceResults from './components/RaceResults';
+import RaceResults from './components/RaceResults.js';
 // import VisualizationTest from './components/VisualizationTest';
 
 function App() {

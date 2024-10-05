@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import axios from 'axios';
-import { DEV_URL } from "../shared-resources/constants";
+import { DEV_URL } from "../shared-resources/constants.js";
 
 const RaceResults = () => {
 

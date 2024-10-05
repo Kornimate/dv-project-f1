@@ -4,19 +4,15 @@ WORKDIR /app
 
 ENV API_URL=/api
 
-COPY public/* /app/public/
-
-COPY src/* /app/src/
-
-COPY package.json /app
-
-COPY package-lock.json /app
+COPY . .
 
 RUN npm install
 
+RUN npm run build
+
 FROM nginx:alpine
 
-COPY ./build /usr/share/nginx/html
+COPY --from=build /app/build /usr/share/nginx/html
 
 COPY default.conf /etc/nginx/conf.d
 
