@@ -1,0 +1,29 @@
+version: '1.0'
+
+name: 'dv-fullstack'
+
+services:
+  backend:
+    build: ./flask/.
+    container_name: 'flask-alpine'
+    ports:
+      - "5000:5000"
+    networks:
+      - common_net
+  
+  frontend:
+    build: ./react/.
+    container_name: "react-alpine"
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    links:
+      - backend
+    networks:
+      - common_net
+
+networks:
+  common_net:
+    driver: bridge
