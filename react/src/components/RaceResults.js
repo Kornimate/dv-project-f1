@@ -16,6 +16,8 @@ const RaceResults = () => {
     
     const [data, setData] = useState([]);
 
+    const [error, setError] = useState('');
+
     useEffect(() => {
 
         async function fetchAPI(){
@@ -25,6 +27,10 @@ const RaceResults = () => {
                     params: raceInfo
                 });
                 
+                if(response.status !== 200){
+                    setError(`${response.status} - ${response?.data?.message}`);
+                }
+
                 setData(JSON.parse(response.data));
             }
             catch {
@@ -39,6 +45,9 @@ const RaceResults = () => {
     return <div>
         <div>
             <h1>{raceInfo.year} - {raceInfo.circuit} - {raceInfo.session}</h1>
+        </div>
+        <div style={{color: "red"}}>
+            {error}
         </div>
         <ol>
             {
