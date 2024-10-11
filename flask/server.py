@@ -1,3 +1,5 @@
+from crypt import methods
+
 from flask import Flask, jsonify, Response, request
 from flask_cors import CORS, cross_origin
 import service
@@ -37,6 +39,15 @@ def index():
 def getData():
     try:
         response = service.getSessionData(int(request.args["year"]), request.args["circuit"],request.args["session"])
+        return jsonify(response.to_json(orient = "records"))
+    except:
+        return Response(ERROR_RESPONSE, status=500, mimetype='application/json')
+
+@app.route("/api/f1-fastest-lap", methods=['GET'])
+def get_fastest_lap():
+    try:
+        print(1)
+        response = service.get_fastest_lap(int(request.args["year"]), request.args["circuit"], request.args["session"], request.args["driver"])
         return jsonify(response.to_json(orient = "records"))
     except:
         return Response(ERROR_RESPONSE, status=500, mimetype='application/json')
