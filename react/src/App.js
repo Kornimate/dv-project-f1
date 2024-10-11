@@ -1,11 +1,10 @@
 import './App.css';
-import RaceResults from './components/RaceResults.js';
-// import VisualizationTest from './components/VisualizationTest';
+import TrackView from "./components/TrackView";
 
 function App() {
   return (
     <div className="App">
-      <RaceResults />
+      <TrackView />
     </div>
   );
 }
