@@ -12,7 +12,7 @@ const RaceResults = () => {
         }
     },[]);
 
-    const url = useMemo(() => (process.env.API_URL === null || process.env.API_URL === undefined ? DEV_URL : process.env.API_URL),[]);
+    const url = useMemo(() => (process.env.REACT_APP_API_URL === null || process.env.REACT_APP_API_URL === undefined ? DEV_URL : process.env.REACT_APP_API_URL),[]);
     
     const [data, setData] = useState([]);
 

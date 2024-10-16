@@ -2,7 +2,7 @@ FROM node:18 as build
 
 WORKDIR /app
 
-ENV API_URL=/api
+ENV REACT_APP_API_URL=/api
 
 COPY . .
 
