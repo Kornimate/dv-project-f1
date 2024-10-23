@@ -43,6 +43,6 @@ def getData():
 
 if __name__ == '__main__':
     if os.environ.get("ENVIRONMENT") == "DEPLOYMENT":
-        app.run(host='0.0.0.0',port=5000)
+        app.run(host='0.0.0.0',port=4000)
     else:
         app.run(debug=True)

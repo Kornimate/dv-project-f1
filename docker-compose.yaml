@@ -8,7 +8,7 @@ services:
     container_name: 'flask-alpine'
     restart: always
     ports:
-      - "5000:5000"
+      - "4000:4000"
     networks:
       - common_net
   

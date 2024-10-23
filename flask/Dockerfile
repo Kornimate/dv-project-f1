@@ -10,8 +10,10 @@ COPY server.py /app
 
 COPY service.py /app
 
-RUN pip install -r requirements.txt
+RUN apk add --no-cache gfortran gcc musl-dev python3-dev libffi-dev build-base openblas-dev
 
-EXPOSE 5000
+RUN pip3 install -r requirements.txt
+
+EXPOSE 4000
 
 CMD ["python","server.py"]
