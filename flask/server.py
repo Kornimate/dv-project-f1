@@ -1,3 +1,4 @@
+import logging
 from flask import Flask, jsonify, Response, request
 from flask_cors import CORS, cross_origin
 import service
@@ -5,6 +6,9 @@ import os
 import json
 
 app = Flask(__name__)
+
+logging.basicConfig(level=logging.DEBUG if os.environ.get("ENVIRONMENT") != "DEPLOYMENT" else logging.INFO)
+
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
@@ -41,6 +45,25 @@ def getData():
     except:
         return Response(ERROR_RESPONSE, status=500, mimetype='application/json')
 
+    
+@app.route('/api/f1-standings', methods=['GET'])
+def getStandings():
+    year = request.args.get("year")
+    circuit = request.args.get("circuit")
+    session = request.args.get("session")
+
+    print("Year:", year, "Circuit:", circuit, "Session:", session)
+    
+    if not year or not circuit or not session:
+        return jsonify({"error": "Missing required parameters"}), 400
+
+    try:
+        response = service.getStandingsData(int(year), circuit, session)
+        return jsonify(response), 200
+    except Exception as e:
+        logging.error("Error fetching standings data: %s", str(e)) 
+        return jsonify({"error": "Internal Server Error"}), 500
+    
 if __name__ == '__main__':
     if os.environ.get("ENVIRONMENT") == "DEPLOYMENT":
         app.run(host='0.0.0.0',port=4000)
