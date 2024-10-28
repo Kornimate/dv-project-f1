@@ -156,10 +156,131 @@ import * as d3 from "d3";
 
 // export default RaceStandings; this
 
+
+// const RaceStandings = () => {
+//     const raceInfo = useMemo(() => ({
+//         year: 2024, 
+//         circuit: 'Monza',
+//         session: 'R'
+//     }), []);
+
+//     const url = useMemo(() => (
+//         process.env.API_URL || DEV_URL
+//     ), []);
+
+//     const [data, setData] = useState([]);
+//     const [error, setError] = useState('');
+//     const [isFetching, setIsFetching] = useState(true);
+//     const [loading, setLoading] = useState(false);
+
+//     useEffect(() => {
+//         const fetchAPI = async () => {
+//             if (!isFetching) return;
+
+//             setLoading(true);
+
+//             try {
+//                 const response = await axios.get(`${url}/f1-standings`, { params: raceInfo });
+//                 console.log('Response Data:', response.data);
+
+//                 if (response.status !== 200) {
+//                     setError(`Error ${response.status}: ${response.data?.message || 'Fetching data failed.'}`);
+//                     return;
+//                 }
+
+//                 let normalizedData = [];
+
+//                 // Normalize the response data
+//                 if (Array.isArray(response.data)) {
+//                     // If it's an array, we can use it directly
+//                     normalizedData = response.data;
+//                 } else if (typeof response.data === 'object') {
+//                     // If it's an object (2024 format), convert it to an array
+//                     if (response.data.lap !== undefined) {
+//                         normalizedData.push(response.data); // Push single lap data as an array item
+//                     } else {
+//                         // Process as lap data with lap as a separate property
+//                         const lapNumber = Object.keys(response.data).includes("lap") ? response.data.lap : null;
+//                         if (lapNumber !== null) {
+//                             normalizedData.push({
+//                                 lap: lapNumber,
+//                                 ...response.data // Spread the driver positions into the object
+//                             });
+//                         }
+//                     }
+//                 } else {
+//                     console.error('Unexpected response format:', response.data);
+//                     setError('Unexpected response format. Please check the API response.');
+//                     return;
+//                 }
+
+//                 const newData = normalizedData.filter(newLap => {
+//                     const isAllNaN = Object.entries(newLap).every(([key, value]) => {
+//                         return key === 'lap' || isNaN(value);
+//                     });
+
+//                     return !isAllNaN && !data.some(lap => lap.lap === newLap.lap);
+//                 });
+
+//                 setData(prevData => {
+//                     const updatedData = [...prevData, ...newData];
+
+//                     const finalLap = Math.max(...updatedData.map(lap => lap.lap));
+//                     if (finalLap >= 52) {
+//                         console.log('Final lap reached. No more fetching.');
+//                         setIsFetching(false);
+//                     }
+
+//                     return updatedData;
+//                 });
+//             } catch (err) {
+//                 console.error('API Error:', err);
+//                 setError('Failed to fetch standings. Please try again later.');
+//             } finally {
+//                 setLoading(false);
+//             }
+//         };
+
+//         fetchAPI();
+//     }, [isFetching, raceInfo, url, data]);
+
+//     return (
+//         <div>
+//             <h1>{raceInfo.year} - {raceInfo.circuit} - {raceInfo.session} Standings</h1>
+//             {error && <div style={{ color: "red" }}>{error}</div>}
+
+//             <table>
+//                 <thead>
+//                     <tr>
+//                         <th>Lap</th>
+//                         <th>Driver</th>
+//                         <th>Position</th>
+//                     </tr>
+//                 </thead>
+//                 <tbody>
+//                     {data.map((lapData) => (
+//                         <React.Fragment key={lapData.lap}>
+//                             {Object.entries(lapData).filter(([key]) => key !== 'lap').map(([driverId, position]) => (
+//                                 <tr key={`${lapData.lap}-${driverId}`}>
+//                                     <td>{lapData.lap}</td>
+//                                     <td>{driverId}</td>
+//                                     <td>{position}</td>
+//                                 </tr>
+//                             ))}
+//                         </React.Fragment>
+//                     ))}
+//                 </tbody>
+//             </table>
+//         </div>
+//     );
+// };
+
+// export default RaceStandings;
+
 const RaceStandings = () => {
     const raceInfo = useMemo(() => ({
         year: 2024, 
-        circuit: 'Monaco',
+        circuit: 'Monza',
         session: 'R'
     }), []);
 
@@ -191,19 +312,16 @@ const RaceStandings = () => {
 
                 // Normalize the response data
                 if (Array.isArray(response.data)) {
-                    // If it's an array, we can use it directly
-                    normalizedData = response.data;
+                    normalizedData = response.data; // Directly use if it's already an array
                 } else if (typeof response.data === 'object') {
-                    // If it's an object (2024 format), convert it to an array
                     if (response.data.lap !== undefined) {
                         normalizedData.push(response.data); // Push single lap data as an array item
                     } else {
-                        // Process as lap data with lap as a separate property
                         const lapNumber = Object.keys(response.data).includes("lap") ? response.data.lap : null;
                         if (lapNumber !== null) {
                             normalizedData.push({
                                 lap: lapNumber,
-                                ...response.data // Spread the driver positions into the object
+                                ...response.data // Spread driver data into the object
                             });
                         }
                     }
@@ -215,7 +333,7 @@ const RaceStandings = () => {
 
                 const newData = normalizedData.filter(newLap => {
                     const isAllNaN = Object.entries(newLap).every(([key, value]) => {
-                        return key === 'lap' || isNaN(value);
+                        return key === 'lap' || (value.position === null && value.team === "Unknown Team");
                     });
 
                     return !isAllNaN && !data.some(lap => lap.lap === newLap.lap);
@@ -253,17 +371,19 @@ const RaceStandings = () => {
                     <tr>
                         <th>Lap</th>
                         <th>Driver</th>
+                        <th>Team</th>
                         <th>Position</th>
                     </tr>
                 </thead>
                 <tbody>
                     {data.map((lapData) => (
                         <React.Fragment key={lapData.lap}>
-                            {Object.entries(lapData).filter(([key]) => key !== 'lap').map(([driverId, position]) => (
+                            {Object.entries(lapData).filter(([key]) => key !== 'lap').map(([driverId, details]) => (
                                 <tr key={`${lapData.lap}-${driverId}`}>
                                     <td>{lapData.lap}</td>
                                     <td>{driverId}</td>
-                                    <td>{position}</td>
+                                    <td>{details.team}</td>  {/* Display the team */}
+                                    <td>{details.position}</td> {/* Display the position */}
                                 </tr>
                             ))}
                         </React.Fragment>
