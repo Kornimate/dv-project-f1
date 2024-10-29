@@ -1,11 +1,10 @@
 import './App.css';
-import RaceResults from './components/RaceResults.js';
-// import VisualizationTest from './components/VisualizationTest';
+import AppRoutes from './routes/AppRoutes.js';
 
 function App() {
   return (
     <div className="App">
-      <RaceResults />
+      <AppRoutes />
     </div>
   );
 }
