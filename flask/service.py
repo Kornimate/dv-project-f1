@@ -21,7 +21,7 @@ def getStandingsData(year, circuit, session):
         raise
 
     standings = []
-    processed_laps = set() 
+    processed_laps = set()
 
     if session.laps.empty:
         logging.warning("No lap data available for the session.")
@@ -29,6 +29,23 @@ def getStandingsData(year, circuit, session):
 
     all_drivers = session.laps['Driver'].unique()
 
+    # Retrieve grid positions from session results
+    grid_positions = {
+        result.Abbreviation: result.GridPosition
+        for result in session.results.itertuples()
+    }
+
+    # First lap includes grid position as the starting position
+    lap_data_dict = {"lap": 0}
+    for driver_id in all_drivers:
+        team_name = session.results.loc[session.results['Abbreviation'] == driver_id, 'TeamName'].values[0]
+        lap_data_dict[driver_id] = {
+            "position": grid_positions.get(driver_id, None),
+            "team": team_name
+        }
+    standings.append(lap_data_dict)  # Append grid positions as lap 0
+
+    # Process each lap for race standings
     for lap_index, lap_data in session.laps.iterrows():
         lap_number = lap_data['LapNumber']
         
@@ -54,9 +71,10 @@ def getStandingsData(year, circuit, session):
 
         standings.append(lap_data_dict)
     
+    # Final results
     final_standings = {"lap": "Final Results"}
     for result in session.results.itertuples():
-        driver = getattr(result, 'Driver', None) or getattr(result, 'Abbreviation', None)
+        driver = getattr(result, 'Abbreviation', None)
         position = getattr(result, 'Position', None)
         team = getattr(result, 'TeamName', None)
 
