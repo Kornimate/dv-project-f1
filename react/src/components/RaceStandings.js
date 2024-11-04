@@ -113,34 +113,32 @@ const formatPosition = (position) => {
 };
 
 
-const RaceStandings = () => {
-    const raceInfo = useMemo(() => ({ year: 2024, circuit: 'Monza', session: 'Race' }), []);
+const RaceStandings = ({ year, circuit}) => {
+    const raceInfo = useMemo(() => ({ year, circuit, session: 'Race' }), [year, circuit]);
     const url = useMemo(() => process.env.API_URL || DEV_URL, []);
     const [data, setData] = useState([]);
     const [error, setError] = useState('');
-    const [isFetching, setIsFetching] = useState(true);
 
     useEffect(() => {
         const fetchAPI = async () => {
-            if (!isFetching) return;
-
             try {
                 const response = await axios.get(`${url}/f1-standings`, { params: raceInfo });
                 console.log("API Response:", response.data);
                 setData(formatData(response.data));
-                setIsFetching(false);
             } catch (err) {
                 console.error("Fetch error:", err);
-                setError('Failed to fetch standings. Please try again later.');
-                setIsFetching(false);
+                //setError('Failed to fetch standings. Please try again later.');
             }
         };
 
         fetchAPI();
-    }, [isFetching, raceInfo, url]);
+    }, [raceInfo, url]); 
 
     useEffect(() => {
-        if (data.length > 0) drawChart(data);
+        if (data.length > 0){
+            drawChart(data);
+        } 
+
     }, [data]);
 
     const formatData = (apiData) => {
@@ -163,7 +161,6 @@ const RaceStandings = () => {
         return Object.values(groupedDrivers).flat();
     };
 
-    
     const drawChart = (driversData) => {
         const svgWidth = 800, svgHeight = 400, margin = { top: 60, right: 30, bottom: 20, left: 50 };
         const width = svgWidth - margin.left - margin.right;
@@ -283,7 +280,7 @@ const RaceStandings = () => {
 
     return (
         <div>
-            <h1>{raceInfo.year} - {raceInfo.circuit} - {raceInfo.session} Standings</h1>
+            <h1>{year} - {circuit} - Race Standings</h1>
             {error && <div style={{ color: "red" }}>{error}</div>}
             <svg id="race-standings-chart"></svg>
         </div>

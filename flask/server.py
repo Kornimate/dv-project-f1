@@ -64,6 +64,15 @@ def getStandings():
         logging.error("Error fetching standings data: %s", str(e)) 
         return jsonify({"error": "Internal Server Error"}), 500
     
+@app.route("/api/f1-circuits", methods=["GET"])
+def get_circuits():
+    year = request.args.get("year", type=int)
+    if not year:
+        return jsonify({"error": "Year is required"}), 400
+    
+    circuits = service.getCircuitsByYear(year)
+    return jsonify({"circuits": circuits})
+    
 if __name__ == '__main__':
     if os.environ.get("ENVIRONMENT") == "DEPLOYMENT":
         app.run(host='0.0.0.0',port=4000)

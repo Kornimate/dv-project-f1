@@ -1,6 +1,7 @@
 import logging
 import fastf1
 import pandas as pd
+import os
 
 def getSessionData(year, circuit, session):
     session = fastf1.get_session(year, circuit, session)
@@ -29,13 +30,11 @@ def getStandingsData(year, circuit, session):
 
     all_drivers = session.laps['Driver'].unique()
 
-    # Retrieve grid positions from session results
     grid_positions = {
         result.Abbreviation: result.GridPosition
         for result in session.results.itertuples()
     }
 
-    # First lap includes grid position as the starting position
     lap_data_dict = {"lap": 0}
     for driver_id in all_drivers:
         team_name = session.results.loc[session.results['Abbreviation'] == driver_id, 'TeamName'].values[0]
@@ -43,9 +42,8 @@ def getStandingsData(year, circuit, session):
             "position": grid_positions.get(driver_id, None),
             "team": team_name
         }
-    standings.append(lap_data_dict)  # Append grid positions as lap 0
+    standings.append(lap_data_dict)
 
-    # Process each lap for race standings
     for lap_index, lap_data in session.laps.iterrows():
         lap_number = lap_data['LapNumber']
         
@@ -87,3 +85,18 @@ def getStandingsData(year, circuit, session):
     standings.append(final_standings)
     logging.info("Standings data prepared successfully.")
     return standings
+
+def getCircuitsByYear(year):
+    try:
+        os.makedirs("cache", exist_ok=True)
+        fastf1.Cache.enable_cache("cache") 
+        schedule = fastf1.get_event_schedule(year)
+        if 'EventName' in schedule.columns:
+            circuits = schedule['EventName'].unique().tolist()
+            return circuits
+        else:
+            logging.warning(f"'EventName' column not found in schedule for year {year}.")
+            return []
+    except Exception as e:
+        logging.error(f"Error fetching circuits for year {year}: {str(e)}")
+        return []
