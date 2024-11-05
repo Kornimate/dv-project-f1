@@ -36,7 +36,7 @@ def index():
 
 #Example method for getting data from the server
 @app.route("/api/f1-race-results",methods=['GET'])
-def getData():
+def get_data():
     try:
         response = service.getSessionData(int(request.args["year"]), request.args["circuit"],request.args["session"])
         return jsonify(response.to_json(orient = "records"))
@@ -46,9 +46,12 @@ def getData():
 @app.route("/api/f1-fastest-lap", methods=['GET'])
 def get_fastest_lap():
     try:
-        print(1)
         response = service.get_fastest_lap(int(request.args["year"]), request.args["circuit"], request.args["session"], request.args["driver"])
-        return jsonify(response.to_json(orient = "records"))
+        response = jsonify(response.to_json(orient = "records"))
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', "*")
+        response.headers.add('Access-Control-Allow-Methods', "*")
+        return response
     except:
         return Response(ERROR_RESPONSE, status=500, mimetype='application/json')
 
