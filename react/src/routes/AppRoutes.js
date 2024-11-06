@@ -5,20 +5,17 @@ import LapTimesPage from '../pages/LapTimesPage';
 import RaceResultsPage from '../pages/RaceResultsPage';
 import StrategiesPage from '../pages/StrategiesPage';
 import NotFound from '../pages/NotFound';
-import Layout from '../layouts/Layout';
+import HomeLayout from '../layouts/HomeLayout';
+import VizLayout from '../layouts/VizLayout';
 
 const AppRoutes = () => {
     return (
-        // <Router>
-        //     <Routes>
-        //         <Route path='/' element={<TestPage />} />
-        //     </Routes>
-        // </Router>
-
         <Router>
             <Routes>
-                <Route path='/' element={<Layout />}>
+                <Route path='/' element={<HomeLayout />}>
                     <Route index element={<HomePage />} />
+                </Route>
+                <Route path="/viz/" element={<VizLayout />}>
                     <Route path='circuits' element={<CircuitsPage />} />
                     <Route path='laptimes' element={<LapTimesPage />} />
                     <Route path='results' element={<RaceResultsPage />} />
