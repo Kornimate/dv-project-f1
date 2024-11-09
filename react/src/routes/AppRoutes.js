@@ -20,6 +20,8 @@ const AppRoutes = () => {
                     <Route path='laptimes' element={<LapTimesPage />} />
                     <Route path='results' element={<RaceResultsPage />} />
                     <Route path='strategies' element={<StrategiesPage />} />
+                </Route>
+                <Route path='*' element={<HomeLayout />}>
                     <Route path='*' element={<NotFound />} />
                 </Route>
             </Routes>

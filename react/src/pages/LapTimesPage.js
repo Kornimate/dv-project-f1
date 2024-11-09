@@ -1,11 +1,9 @@
-import { Link } from "react-router-dom";
+import LapTimes from '../components/LapTimes';
 
 const LapTimesPage = () => {
     return (
         <div>
-            <Link to="/">
-                <button>Home</button>
-            </Link>
+            <LapTimes />
         </div>
     )
 }

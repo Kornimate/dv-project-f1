@@ -1,13 +1,13 @@
 import { Outlet } from "react-router-dom";
 import Box from '@mui/material/Box';
 import { Toolbar, AppBar } from "@mui/material";
-import Drawer from "../components/Drawer";
+import Flyout from "../components/Flyout";
 const VizLayout = () => {
     return (
         <>
-            <AppBar position="static">
+            <AppBar position="static" sx={{backgroundColor: "#FF1E00"}}>
                 <Toolbar>
-                    <Drawer />
+                    <Flyout />
                 </Toolbar>
             </AppBar>
             <Box sx={{ width: '100%', height: "90vh"}}>

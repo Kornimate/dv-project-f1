@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import '../styles/NotFound.css'
 
 const NotFound = () => {
     return (
@@ -8,7 +9,11 @@ const NotFound = () => {
             </h1>
             <div>
                 <Link to="/">
-                    <button>Home</button>
+                    <button>
+                        <h2>
+                            Home
+                        </h2>
+                    </button>
                 </Link>
             </div>
         </>
