@@ -1,0 +1,12 @@
+button {
+    padding: 10px 20px;
+    color: #1C1C1E;
+    background-color: #FF1E00;
+    border: 6px solid transparent;
+    transition: border-color 0.3s ease;
+    border-radius: 10px;
+  }
+  
+  button:hover {
+    border-color: #1C1C1E;
+  }
