@@ -4,87 +4,6 @@ import { DEV_URL } from "../shared-resources/constants.js";
 import * as d3 from "d3";
 import CircularProgress from '@mui/material/CircularProgress';
 
-// const RaceStandings = () => {   no vis
-//     const raceInfo = useMemo(() => ({
-//         year: 2023, 
-//         circuit: 'Monaco',
-//         session: 'R'
-//     }), []);
-
-//     const url = useMemo(() => (
-//         process.env.API_URL || DEV_URL
-//     ), []);
-
-//     const [data, setData] = useState([]);
-//     const [error, setError] = useState('');
-//     const [isFetching, setIsFetching] = useState(true);
-//     const [loading, setLoading] = useState(false);
-
-//     useEffect(() => {
-//         const fetchAPI = async () => {
-//             if (!isFetching) return;
-
-//             setLoading(true);
-
-//             try {
-//                 const response = await axios.get(`${url}/f1-standings`, { params: raceInfo });
-//                 console.log('Response Data:', response.data);
-
-//                 if (response.status !== 200) {
-//                     setError(`Error ${response.status}: ${response.data?.message || 'Fetching data failed.'}`);
-//                     return;
-//                 }
-
-//                 const normalizedData = Array.isArray(response.data) ? response.data : [response.data];
-//                 setData(normalizedData);
-
-//                 setIsFetching(false);  // Stop fetching once all laps and final results are loaded
-//             } catch (err) {
-//                 console.error('API Error:', err);
-//                 setError('Failed to fetch standings. Please try again later.');
-//             } finally {
-//                 setLoading(false);
-//             }
-//         };
-
-//         fetchAPI();
-//     }, [isFetching, raceInfo, url]);
-
-//     return (
-//         <div>
-//             <h1>{raceInfo.year} - {raceInfo.circuit} - {raceInfo.session} Standings</h1>
-//             {error && <div style={{ color: "red" }}>{error}</div>}
-
-//             <table>
-//                 <thead>
-//                     <tr>
-//                         <th>Lap</th>
-//                         <th>Driver</th>
-//                         <th>Team</th>
-//                         <th>Position</th>
-//                     </tr>
-//                 </thead>
-//                 <tbody>
-//                     {data.map((lapData, index) => (
-//                         <React.Fragment key={lapData.lap}>
-//                             {Object.entries(lapData).filter(([key]) => key !== 'lap').map(([driverId, details]) => (
-//                                 <tr key={`${lapData.lap}-${driverId}`} style={lapData.lap === "Final Results" ? { fontWeight: "bold" } : {}}>
-//                                     <td>{lapData.lap}</td>
-//                                     <td>{driverId}</td>
-//                                     <td>{details.team}</td>
-//                                     <td>{details.position}</td>
-//                                 </tr>
-//                             ))}
-//                         </React.Fragment>
-//                     ))}
-//                 </tbody>
-//             </table>
-//         </div>
-//     );
-// };
-
-// export default RaceStandings; no vis
-
 const teamColors = {
     "Ferrari": "#F50000",          // Red
     "Mercedes": "#00D2BE",         // Tirqruise
@@ -132,7 +51,7 @@ const RaceStandings = ({ year, circuit}) => {
                 console.error("Fetch error:", err);
                 //setError('Failed to fetch standings. Please try again later.');
             } finally {
-                setLoading(false);  // Stop loading
+                setLoading(false); 
             }
         };
 
@@ -216,9 +135,9 @@ const RaceStandings = ({ year, circuit}) => {
             const team = driver.team;
             if (!teamMap[team]) teamMap[team] = [];
             driver.bestPosition = Math.min(...driver.positions.filter(pos => pos !== null));
-            const firstLapPosition = driver.positions[0]; // First lap position
-            const finalPosition = driver.positions[driver.positions.length - 1]; // Final position
-            driver.positionChange = firstLapPosition !== null ? firstLapPosition - finalPosition : null; // Change in position
+            const firstLapPosition = driver.positions[0]; 
+            const finalPosition = driver.positions[driver.positions.length - 1]; 
+            driver.positionChange = firstLapPosition !== null ? firstLapPosition - finalPosition : null; 
             teamMap[team].push(driver);
         });
     
@@ -261,8 +180,8 @@ const RaceStandings = ({ year, circuit}) => {
                         .style("font-weight", "600")
                         .style("text-anchor", "start")
                         .on("mouseover", () => {
-                            d3.selectAll(".driver-line").style("opacity", 0.06); // Dim all driver lines
-                            linePath.style("opacity", 1); // Highlight the hovered line
+                            d3.selectAll(".driver-line").style("opacity", 0.06); //Dim all driver lines
+                            linePath.style("opacity", 1); //Highlight the hovered line
                             tooltip.style("visibility", "visible").html(
                                 `Driver: ${driver.driverId}<br>
                                 Team: ${driver.team}<br>

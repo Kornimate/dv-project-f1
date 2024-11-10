@@ -69,7 +69,7 @@ def getStandingsData(year, circuit, session):
 
         standings.append(lap_data_dict)
     
-    # Final results
+   
     final_standings = {"lap": "Final Results"}
     for result in session.results.itertuples():
         driver = getattr(result, 'Abbreviation', None)
