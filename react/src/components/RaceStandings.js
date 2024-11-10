@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import axios from 'axios';
 import { DEV_URL } from "../shared-resources/constants.js";
 import * as d3 from "d3";
+import CircularProgress from '@mui/material/CircularProgress';
 
 // const RaceStandings = () => {   no vis
 //     const raceInfo = useMemo(() => ({
@@ -118,9 +119,11 @@ const RaceStandings = ({ year, circuit}) => {
     const url = useMemo(() => process.env.API_URL || DEV_URL, []);
     const [data, setData] = useState([]);
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchAPI = async () => {
+            setLoading(true);
             try {
                 const response = await axios.get(`${url}/f1-standings`, { params: raceInfo });
                 console.log("API Response:", response.data);
@@ -128,6 +131,8 @@ const RaceStandings = ({ year, circuit}) => {
             } catch (err) {
                 console.error("Fetch error:", err);
                 //setError('Failed to fetch standings. Please try again later.');
+            } finally {
+                setLoading(false);  // Stop loading
             }
         };
 
@@ -282,7 +287,11 @@ const RaceStandings = ({ year, circuit}) => {
         <div>
             <h1>{year} - {circuit} - Race Standings</h1>
             {error && <div style={{ color: "red" }}>{error}</div>}
-            <svg id="race-standings-chart"></svg>
+            {loading ? (
+                <CircularProgress />
+            ) : (
+                <svg id="race-standings-chart"></svg>
+            )}
         </div>
     );
 };

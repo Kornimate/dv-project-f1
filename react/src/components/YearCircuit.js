@@ -23,7 +23,7 @@ const YearCircuit = () => {
 
     return (
         <div>
-            <FormControl sx={{ minWidth: 150, marginBottom: 2 }}>
+            <FormControl sx={{ minWidth: 150, marginBottom: 2 , marginTop: 3}}>
                 <InputLabel>Select Year</InputLabel>
                 <Select
                     value={year}
@@ -36,7 +36,7 @@ const YearCircuit = () => {
                 </Select>
             </FormControl>
 
-            <FormControl sx={{ minWidth: 200, marginLeft: 2, marginBottom: 2 }}>
+            <FormControl sx={{ minWidth: 200, marginLeft: 2, marginBottom: 2, marginTop: 3}}>
                 <InputLabel>Select Circuit</InputLabel>
                 <Select
                     value={selectedCircuit}
