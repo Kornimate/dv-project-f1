@@ -24,7 +24,6 @@ const LapTimes = () => {
         console.log(e.target.value)
         if(e.target.value !== 0){
             setYear(e.target.value)
-            setRacesVisible(true)
         }
     }
 
@@ -41,6 +40,7 @@ const LapTimes = () => {
     
             console.log(response.data);
             setRaces(response.data)
+            setRacesVisible(true)
         }
 
         getRaces();
