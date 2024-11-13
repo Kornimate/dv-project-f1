@@ -8,8 +8,8 @@ def getSessionData(year, circuit, session):
 
     return session.results
 
-def getRaceLapTimes(year, circuit, racer_1, racer_2):
-    race = fastf1.get_session(year, circuit, "R")
+def getRaceLapTimesForDrivers(year, race_number, racer_1, racer_2):
+    race = fastf1.get_session(year, race_number, 'R')
     race.load(telemetry=False, laps=True, weather=False)
 
     laps_for_racers = []
@@ -17,23 +17,31 @@ def getRaceLapTimes(year, circuit, racer_1, racer_2):
     for driver in (racer_1, racer_2):
         laps = race.laps.pick_driver(driver).pick_quicklaps().reset_index()
         laps = [{'lap': i, 'lapTime': d.total_seconds()} for i, d in enumerate(list(laps['LapTime']))]
-        # print(f"{driver}: {laps}\n")
         laps_for_racers.append({
             'driver': driver,
+            'color': plotting.get_driver_color(driver, race),
             'laps': laps
         })
     
     return laps_for_racers
 
-def getDriversForRace(session):
-    return plotting.list_driver_names(session)
+def getDriversForRace(year, race_number):
+    session = fastf1.get_session(year=year, gp=race_number, identifier='R')
+    names = plotting.list_driver_names(session)
+    abbrs = plotting.list_driver_abbreviations(session)
+    
+    if len(names) != len(abbrs):
+        raise IndexError("collections not the same size")
+    
+    return [{'name': names[i], 'abbr' : abbrs[i]} for i in range(len(names))]
 
-def getYearRaces(year):
+def getRacesForYear(year):
     data = fastf1.get_event_schedule(year)
-    print(data.columns)
     return list(data.query("EventFormat != 'testing'")['EventName'])
 
 
 # getRaceLapTimes(2024, "Monza", "OCO", "GAS")
-# print(getDriversForRace(fastf1.get_session(2021,'Hungary','R')))
+# print(getDriversForRace(2021, 1))
 # print(getYearRaces(2021))
+
+# print(getRaceLapTimesForDrivers(2021, 1, "GAS", "TSU"))
