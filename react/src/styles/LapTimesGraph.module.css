@@ -1,0 +1,25 @@
+.grid line {
+    stroke: rgb(230,230,230);
+    stroke-opacity: 0.9;
+    shape-rendering: crispEdges;
+  }
+  
+.grid path {
+  stroke-width: 0;
+}
+
+.divStyle {
+  border: 1px solid black;
+  margin-top: 2%;
+  margin-bottom: 2%;
+  border-radius: 10px;
+}
+
+.centeredDiv{
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  text-align: center;
+  margin-top: 1%;
+  margin-bottom: 1%;
+}

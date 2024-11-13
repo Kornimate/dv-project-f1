@@ -54,7 +54,7 @@ const LapTimesVisualization = ({year, race, racer1, racer2}) =>{
     return (
         <Box sx={{ marginTop: '5%', borderWidth: 5, borderBlock: 'black', borderRadius: 5}}>
             {!loaded ?
-                <CircularProgress size="3rem" />
+                <CircularProgress size="3rem" color='error'/>
             :
                 <LapTimesGraph l1={l1} l2={l2} r1={r1} r2={r2} c1={c1} c2={c2} /> }
         </Box>
