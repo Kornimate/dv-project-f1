@@ -19,6 +19,10 @@ const LapTimesGraph = ({l1, l2, r1, r2, c1, c2}) => {
 
         let activeTooltip1 = false;
         let activeTooltip2 = false;
+        let alternator = 0;
+        let clickTimeout;
+
+        const points = [null,null];
 
         if(l1.length === 0 || l2.length === 0)
             return;
@@ -132,7 +136,8 @@ const LapTimesGraph = ({l1, l2, r1, r2, c1, c2}) => {
         .attr("class", "label")
         .attr("x", xScale(l1[l1.length-1].lap))
         .attr("y", yScale(l1[l1.length-1].lapTime))
-        .attr("dy", "-0.5em")
+        .attr("dy", (l2[l2.length-1].lapTime > l1[l1.length-1].lapTime ? "+1em" : (l2[l2.length-1].lapTime < l1[l1.length-1].lapTime  ? "-0.5em" : "-0.5em")))
+        .attr("dx", "+0.1em")
         .style("fill", c1)
         .text(r1);
       
@@ -140,12 +145,13 @@ const LapTimesGraph = ({l1, l2, r1, r2, c1, c2}) => {
         .attr("class", "label")
         .attr("x", xScale(l2[l2.length-1].lap))
         .attr("y", yScale(l2[l2.length-1].lapTime))
-        .attr("dy", "-0.5em")
+        .attr("dy", (l2[l2.length-1].lapTime < l1[l1.length-1].lapTime ? "+1.2em" : (l2[l2.length-1].lapTime > l1[l1.length-1].lapTime  ? "-0.5em" : "+1em")))
+        .attr("dx", "+0.1em")
         .style("fill", c2)
         .text(r2);
 
         function getTicksForYAxis(){
-            return Math.min((Math.max(d3.max(l1, d => d.lapTime), d3.max(l1, d => d.lapTime)) - Math.min(d3.min(l1, d => d.lapTime), d3.min(l1, d => d.lapTime)))*5, 20);
+            return Math.min((Math.max(d3.max(l1, d => d.lapTime), d3.max(l1, d => d.lapTime)) - Math.min(d3.min(l1, d => d.lapTime), d3.min(l1, d => d.lapTime)))*5, 15);
         }
 
         const tooltip = d3.select(toolTipRef.current);
@@ -180,6 +186,18 @@ const LapTimesGraph = ({l1, l2, r1, r2, c1, c2}) => {
             }
 
             activeTooltip1 = false;
+        })
+        .on("click", (event, d) => {
+            if (clickTimeout) {
+                clearTimeout(clickTimeout);
+                clickTimeout = null;
+                handleDoubleClickOnCircle(d, 'l1', r1, c1); 
+            } else {
+                clickTimeout = setTimeout(() => {
+                    handleClickOnCircle(d, 'l1', r1, c1);                    
+                    clickTimeout = null;
+                }, 250); // delay for double click
+            }
         });
 
         svg.selectAll("circle.l2")
@@ -211,9 +229,116 @@ const LapTimesGraph = ({l1, l2, r1, r2, c1, c2}) => {
             }
 
             activeTooltip2 = false;
+        })
+        .on("click", (event, d) => {
+            if (clickTimeout) {
+                clearTimeout(clickTimeout);
+                clickTimeout = null;
+                handleDoubleClickOnCircle(d, 'l2', r2, c2); 
+            } else {
+                clickTimeout = setTimeout(() => {
+                    handleClickOnCircle(d, 'l2', r2, c2);                    
+                    clickTimeout = null;
+                }, 250); // delay for double click
+            }
         });
 
         setSvg(svg);
+
+        function handleClickOnCircle(target, line, driver, driverColor){
+            
+            if(points[alternator] === null){
+                points[alternator] = {
+                    driver: driver,
+                    lap: target.lap
+                };
+
+                svg.selectAll(`circle.${line}`)
+                    .each(function(c){
+                        if(c.lap == target.lap){
+                            d3.select(this)
+                            .style("fill", "yellow");
+                        }
+                });
+                
+                IncrementAlternator();
+
+                return;
+            }
+
+            for(let i=0;i<points.length;i++){
+                if(points[i].driver === driver && points[i].lap === target.lap)
+                    return;
+            }
+
+            svg.selectAll(`circle.${getDriverLine(points[alternator].driver)}`)
+                    .each(function(c){
+                        if(c.lap === points[alternator].lap){
+                            d3.select(this)
+                            .style("fill", getDriverColor(points[alternator].driver));
+                        }
+            });
+
+            svg.selectAll(`circle.${line}`)
+                    .each(function(c){
+                        if(c.lap === target.lap){
+                            d3.select(this)
+                            .style("fill", "yellow");
+                        }
+            });
+
+            points[alternator] = {
+                driver: driver,
+                lap: target.lap
+            };
+              
+            
+            IncrementAlternator();
+        }
+
+        function IncrementAlternator(){
+            alternator = (alternator + 1) % points.length;
+        }
+
+        function getPreviousAlternator(){
+            return Math.abs(alternator-1) % 2;
+        }
+
+        function getDriverLine(driver){
+            if(driver === r1) return 'l1';
+
+            return 'l2';
+        }
+
+        function getDriverColor(driver){
+            if(driver === r1) return c1;
+
+            return c2;
+        }
+
+        function handleDoubleClickOnCircle(target, line, driver, driverColor){
+            for(let i = 0;i < points.length; i++){
+                if(points[i] === null){
+                    continue;
+                }
+
+                if(points[i].driver === driver && points[i].lap === target.lap){
+                    points[i] = null;
+                    
+                    svg.selectAll(`circle.${line}`)
+                    .each(function(c){
+                        if(c.lap == target.lap){
+                            d3.select(this)
+                            .style("fill", driverColor);
+                        }
+                    });
+
+                    alternator = i;
+
+                    return;
+                }
+            }
+        }
 
     }, [l1, l2, r1, r2, c1, c2]);
 
@@ -309,7 +434,6 @@ const LapTimesGraph = ({l1, l2, r1, r2, c1, c2}) => {
 
         setBtnDisabled(true);
         Animate(0);
-        simulationRef.current.scrollIntoView({ behavior: "smooth" });
     }
 
     return (

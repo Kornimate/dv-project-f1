@@ -13,6 +13,11 @@
   margin-top: 2%;
   margin-bottom: 2%;
   border-radius: 10px;
+  overflow-x: scroll;
+}
+
+svg {
+  margin:3px;
 }
 
 .centeredDiv{
