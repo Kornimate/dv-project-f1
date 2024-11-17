@@ -4,9 +4,10 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import * as d3 from 'd3';
 import styles from '../styles/LapTimesGraph.module.css';
 import '../styles/LapTimesGraph.css'
+import VisualizationsNavigation from "./VisualizatonsNavigation";
 
 
-const LapTimesGraph = ({l1, l2, r1, r2, c1, c2}) => {
+const LapTimesGraph = ({year, race, l1, l2, r1, r2, c1, c2}) => {
 
     const svgRef = useRef();
     const toolTipRef = useRef();
@@ -14,6 +15,7 @@ const LapTimesGraph = ({l1, l2, r1, r2, c1, c2}) => {
 
     const [Svg, setSvg] = useState(null);
     const [btnDisabled, setBtnDisabled] = useState(false);
+    const [laps, setLaps] = useState([null, null])
 
     useEffect(() => {
 
@@ -250,18 +252,20 @@ const LapTimesGraph = ({l1, l2, r1, r2, c1, c2}) => {
             if(points[alternator] === null){
                 points[alternator] = {
                     driver: driver,
-                    lap: target.lap
+                    lap: target.lap,
+                    lapNumber: target.lapNumber
                 };
 
                 svg.selectAll(`circle.${line}`)
                     .each(function(c){
-                        if(c.lap == target.lap){
+                        if(c.lap === target.lap){
                             d3.select(this)
                             .style("fill", "yellow");
                         }
                 });
                 
                 IncrementAlternator();
+                setLaps([...points]);
 
                 return;
             }
@@ -289,19 +293,17 @@ const LapTimesGraph = ({l1, l2, r1, r2, c1, c2}) => {
 
             points[alternator] = {
                 driver: driver,
-                lap: target.lap
+                lap: target.lap,
+                lapNumber: target.lapNumber
             };
               
             
             IncrementAlternator();
+            setLaps([...points])
         }
 
         function IncrementAlternator(){
             alternator = (alternator + 1) % points.length;
-        }
-
-        function getPreviousAlternator(){
-            return Math.abs(alternator-1) % 2;
         }
 
         function getDriverLine(driver){
@@ -327,14 +329,15 @@ const LapTimesGraph = ({l1, l2, r1, r2, c1, c2}) => {
                     
                     svg.selectAll(`circle.${line}`)
                     .each(function(c){
-                        if(c.lap == target.lap){
+                        if(c.lap === target.lap){
                             d3.select(this)
                             .style("fill", driverColor);
                         }
                     });
 
                     alternator = i;
-
+                    setLaps([...points])
+                    
                     return;
                 }
             }
@@ -442,6 +445,7 @@ const LapTimesGraph = ({l1, l2, r1, r2, c1, c2}) => {
             <svg width="700" height="400" ref={svgRef}></svg>
         </div>
             <div ref={toolTipRef} style={{ position: 'absolute', display: 'none', padding: '8px', backgroundColor: 'white', border: '1px solid #c0c0c0', borderRadius: '4px' }}></div>
+            <VisualizationsNavigation year={year} race={race} r1={r1} r2={r2} l1={laps[0]} l2={laps[1]} />
             <div className={styles.divStyle}>
                 <h1>{r1} vs {r2}</h1>
                 <div ref={simulationRef} className={styles.centeredDiv}></div>

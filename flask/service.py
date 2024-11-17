@@ -16,7 +16,7 @@ def getRaceLapTimesForDrivers(year, race_number, racer_1, racer_2):
 
     for driver in (racer_1, racer_2):
         laps = race.laps.pick_driver(driver).pick_quicklaps().reset_index()
-        laps = [{'lap': i, 'lapTime': d.total_seconds()} for i, d in enumerate(list(laps['LapTime']))]
+        laps = [{'lap': i, 'lapTime': d['LapTime'].total_seconds(), 'lapNumber': int(d['LapNumber'])} for i, d in enumerate(list(laps[['LapTime','LapNumber']].to_dict(orient='records')))]
         laps_for_racers.append({
             'driver': driver,
             'color': plotting.get_driver_color(driver, race),
@@ -40,7 +40,7 @@ def getRacesForYear(year):
     return list(data.query("EventFormat != 'testing'")['EventName'])
 
 
-# getRaceLapTimes(2024, "Monza", "OCO", "GAS")
+print(getRaceLapTimesForDrivers(2024, "Monza", "OCO", "GAS"))
 # print(getDriversForRace(2021, 1))
 # print(getYearRaces(2021))
 

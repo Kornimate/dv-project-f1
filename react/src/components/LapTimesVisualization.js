@@ -56,7 +56,7 @@ const LapTimesVisualization = ({year, race, racer1, racer2}) =>{
             {!loaded ?
                 <CircularProgress size="3rem" color='error'/>
             :
-                <LapTimesGraph l1={l1} l2={l2} r1={r1} r2={r2} c1={c1} c2={c2} /> }
+                <LapTimesGraph year={year} race={race} l1={l1} l2={l2} r1={r1} r2={r2} c1={c1} c2={c2} /> }
         </Box>
     );
 }
