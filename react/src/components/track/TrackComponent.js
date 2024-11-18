@@ -11,10 +11,10 @@ const TrackComponent = () => {
 
     const [driver1, setDriver1] = useState('VER'); // Default to Max Verstappen
     const [driver2, setDriver2] = useState('HAM'); // Default to Lewis Hamilton
-    const [raceInfo] = useState({ year: 2024, circuit: 'Monza', session: 'Q' });
+    const [raceInfo] = useState({ year: 2024, circuit: 'Spa', session: 'Q' });
 
 
-    const tooltipRef = useRef(); // Moved useRef here, at the top level of the component
+    const tooltipRef = useRef();
 
     const handleColorAttributeChange = (e) => {
         setColorAttribute(e.target.value);
@@ -38,7 +38,7 @@ const TrackComponent = () => {
 
     return (
         <TrackDataProvider raceInfo={raceInfo} driver1={driver1} driver2={driver2} colorAttribute={colorAttribute}>
-            {({ data, error }) => (
+            {({ data, error, loading }) => (
                 <>
                     <div>
                         <label>Choose Driver 1:</label>
@@ -76,10 +76,14 @@ const TrackComponent = () => {
                         <option value="DRS">DRS Status</option>
                     </select>
 
-                    {viewType === 'track' ? (
-                        <TrackView data={data} colorAttribute={colorAttribute} tooltipRef={tooltipRef} comparisonMode={comparisonMode} />
+                    {loading ? (
+                        <div>Loading data...</div>
+                    ) : error ? (
+                        <div>Error: {error}</div>
+                    ) : viewType === 'track' ? (
+                        <TrackView data={data} driver1={driver1} driver2={driver2} colorAttribute={colorAttribute} tooltipRef={tooltipRef} comparisonMode={comparisonMode} />
                     ) : (
-                        <LineChart data={data} colorAttribute={colorAttribute} />
+                        <LineChart data={data} driver1={driver1} driver2={driver2} colorAttribute={colorAttribute} />
                     )}
                 </>
             )}

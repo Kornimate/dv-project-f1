@@ -1,7 +1,7 @@
 import * as d3 from "d3";
 import { useEffect, useRef } from "react";
 
-const LineChart = ({ data, colorAttribute }) => {
+const LineChart = ({ data, driver1, driver2, colorAttribute }) => {
     const svgRef = useRef();
 
     useEffect(() => {
@@ -80,11 +80,29 @@ const LineChart = ({ data, colorAttribute }) => {
 
         const marker1 = crosshairGroup.append("circle")
             .attr("fill", "steelblue")
-            .attr("r", 4);
+            .attr("r", 6);
 
         const marker2 = crosshairGroup.append("circle")
             .attr("fill", "orange")
-            .attr("r", 4);
+            .attr("r", 6);
+
+        const tooltipGroup = svg.append("g")
+            .attr("class", "tooltip")
+            .style("display", "none");
+
+        const tooltipRect = tooltipGroup.append("rect")
+            .attr("width", 150)
+            .attr("height", 50)
+            .attr("fill", "white")
+            .attr("stroke", "black")
+            .attr("rx", 4)
+            .attr("ry", 4);
+
+        const tooltipText = tooltipGroup.append("text")
+            .attr("x", 5)
+            .attr("y", 15)
+            .attr("font-size", "12px")
+            .attr("fill", "black");
 
         let currentXScale = distanceScale;
         let currentYScale = valueScale;
@@ -96,8 +114,14 @@ const LineChart = ({ data, colorAttribute }) => {
             .attr("y", margin.top)
             .attr("fill", "none")
             .attr("pointer-events", "all")
-            .on("mouseover", () => crosshairGroup.style("display", null))
-            .on("mouseout", () => crosshairGroup.style("display", "none"))
+            .on("mouseover", () => {
+                crosshairGroup.style("display", null);
+                tooltipGroup.style("display", null);
+            })
+            .on("mouseout", () => {
+                crosshairGroup.style("display", "none");
+                tooltipGroup.style("display", "none");
+            })
             .on("mousemove", function(event) {
                 const [mouseX] = d3.pointer(event);
                 const xValue = currentXScale.invert(mouseX);
@@ -121,26 +145,29 @@ const LineChart = ({ data, colorAttribute }) => {
 
                 marker1.attr("cx", xPos1).attr("cy", yPos1);
                 marker2.attr("cx", xPos2).attr("cy", yPos2);
-            });
 
+                // Update tooltip content and position
+                tooltipGroup.attr("transform", `translate(${xPos1 + 10},${yPos1 - 30})`);
+                tooltipText.text(`${driver1}: ${closestDriver1[colorAttribute]}\n${driver2}: ${closestDriver2[colorAttribute]}`);
+            });
         const zoom = d3.zoom()
             .scaleExtent([1, 10])
             .translateExtent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]])
             .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]])
             .on("zoom", function(event) {
                 const { transform } = event;
-                currentXScale = transform.rescaleX(distanceScale);
+
                 currentYScale = transform.rescaleY(valueScale);
 
-                xAxis.call(d3.axisBottom(currentXScale).ticks(10));
                 yAxis.call(d3.axisLeft(currentYScale).ticks(10));
 
                 svg.selectAll(".driver1-line")
-                    .attr("d", line.x(d => currentXScale(d.Distance)).y(d => currentYScale(d[colorAttribute])));
+                    .attr("d", line.y(d => currentYScale(d[colorAttribute])));
 
                 svg.selectAll(".driver2-line")
-                    .attr("d", line.x(d => currentXScale(d.Distance)).y(d => currentYScale(d[colorAttribute])));
+                    .attr("d", line.y(d => currentYScale(d[colorAttribute])));
             });
+
 
         svg.call(zoom);
     }, [data, colorAttribute]);
