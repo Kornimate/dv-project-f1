@@ -47,11 +47,7 @@ def get_data():
 def get_fastest_lap():
     try:
         response = service.get_fastest_lap(int(request.args["year"]), request.args["circuit"], request.args["session"], request.args["driver"])
-        response = jsonify(response.to_json(orient = "records"))
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        response.headers.add('Access-Control-Allow-Headers', "*")
-        response.headers.add('Access-Control-Allow-Methods', "*")
-        return response
+        return jsonify(response.to_json(orient = "records"))
     except:
         return Response(ERROR_RESPONSE, status=500, mimetype='application/json')
 

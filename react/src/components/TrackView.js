@@ -47,8 +47,8 @@ const TrackView = () => {
 
         const svg = d3.select(svgRef.current);
         const tooltip = d3.select(tooltipRef.current);
-        const width = 800;
-        const height = 600;
+        const width = 1000;
+        const height = 800;
 
         svg.attr("viewBox", `0 0 ${width} ${height}`).style("overflow", "visible");
 

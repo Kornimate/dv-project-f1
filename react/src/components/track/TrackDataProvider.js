@@ -7,9 +7,11 @@ const TrackDataProvider = ({ raceInfo, driver1, driver2, colorAttribute, childre
 
     const [data, setData] = useState([]);
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             try {
                 const response1 = await axios.get(`${url}/f1-fastest-lap`, {
                     params: { ...raceInfo, driver: driver1 }
@@ -29,13 +31,15 @@ const TrackDataProvider = ({ raceInfo, driver1, driver2, colorAttribute, childre
                 }
             } catch (error) {
                 setError('Failed to fetch data');
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchData()
     }, [raceInfo, driver1, driver2, url]);
 
-    return children({ data, error, colorAttribute, setData });
+    return children({ data, error, loading, colorAttribute, setData });
 };
 
 export default TrackDataProvider;

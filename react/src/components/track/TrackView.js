@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import * as d3 from 'd3';
 
-const TrackView = ({ data, colorAttribute, tooltipRef, comparisonMode }) => {
+const TrackView = ({ data, driver1, driver2, colorAttribute, tooltipRef, comparisonMode }) => {
     const svgRef = useRef();
 
     useEffect(() => {
