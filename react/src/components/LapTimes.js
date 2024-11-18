@@ -1,5 +1,6 @@
 import { FormControl, InputLabel, Select, MenuItem, Box } from '@mui/material';
 import { useEffect, useState, useMemo } from 'react';
+import { useSearchParams, useNavigate, useLocation } from 'react-router-dom'; 
 import { YEARS, DEV_URL } from '../shared-resources/constants';
 import axios from 'axios';
 import LapTimesVisualization from './LapTimesVisualization';
@@ -15,6 +16,11 @@ const LapTimes = () => {
     const [racesVisible, setRacesVisible] = useState(false);
     const [racersVisible, setRacersVisible] = useState(false);
     const [startVisualization, setStartVisualization] = useState(false);
+    
+    // eslint-disable-next-line
+    const [searchParams, _] = useSearchParams();
+    const navigate = useNavigate();
+    const location = useLocation();
 
     const url = useMemo(() => (process.env.REACT_APP_API_URL === null || process.env.REACT_APP_API_URL === undefined ? DEV_URL : process.env.REACT_APP_API_URL),[]);
     
@@ -59,8 +65,37 @@ const LapTimes = () => {
     }
 
     useEffect(() => {
+
+        if(Array.from(new URLSearchParams(location.search)).length === 0)
+            return;
+
+        try{
+            const y = parseInt(searchParams.get('year'));
+            
+            if(isNaN(y) || y === null || y === undefined || y < YEARS[YEARS.length-1] || y > YEARS[0])
+                throw new Error("invalid year");
+
+            const r = searchParams.get('race');
+            const p1 = searchParams.get('racer1');
+            const p2 = searchParams.get('racer2');
+
+            if(r === null || p1 === null || p2 === null || p1 === p2)
+                throw new Error('invalid query string');
+
+            setYear(y);
+            setRace(r);
+            setRacer1(p1);
+            setRacer2(p2);
+
+        } catch {
+            alert('Invalid data in URL! Navigating back to Home Page!');
+            navigate('/');
+        }
+    }, [navigate, searchParams, location])
+
+    useEffect(() => {
         async function getRaces(){
-            if(year === 0)
+            if(year === 0 || isNaN(year) || year === '' || year === undefined || year === null)
                 return;
 
             const response = await axios.get(`${url}/calendar-year-races`,{
@@ -79,7 +114,7 @@ const LapTimes = () => {
 
     useEffect(() => {
         async function getRacers(){
-            if(year === 0 || race === '')
+            if(year === 0 || isNaN(year) || year === '' || year === undefined || year === null || race === '' || race=== undefined || race === null)
                 return;
 
             const response = await axios.get(`${url}/pilots-for-race`,{
