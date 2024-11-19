@@ -38,11 +38,18 @@
 }
 
 .chart-container {
-  max-width: 90%;
-  margin: 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: auto; /* Adjust dynamically to content */
+  margin: 0 auto;
+  padding: 0;
+  width: 90vw; /* Make chart wider */
+  overflow: hidden; /* Prevent unnecessary scrolling */
 }
 
 svg {
-  width: 100%;
-  height: auto;
+  display: block;
+  margin: auto; /* Center the chart horizontally */
 }
