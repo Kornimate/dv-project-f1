@@ -83,7 +83,7 @@ def get_tire_strategy():
         if not year or not circuit or not session:
             return jsonify({"error": "Missing required parameters"}), 400
         
-        tire_strategy = service.getTireStrategyData(year, circuit, session)
+        tire_strategy = service.getTireStrategyData2(year, circuit, session)
         return jsonify({"success": True, "tire_strategy": tire_strategy})
 
     except Exception as e:

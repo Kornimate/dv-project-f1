@@ -32,7 +32,9 @@ const TireStrategyVisualization = () => {
         console.error("Error fetching tire data:", error);
       }
     }
+
     fetchData();
+  
   }, [raceInfo]);
 
   const compoundColors = {
@@ -42,7 +44,7 @@ const TireStrategyVisualization = () => {
   };
 
   useEffect(() => {
-    console.log("Tire data:", tireData); // Debugging
+    // console.log("Tire data:", tireData); // Debugging
   
     if (tireData.length === 0) return;
   
@@ -51,12 +53,6 @@ const TireStrategyVisualization = () => {
     const barHeight = 20; // Fixed bar height for each row
     const chartHeight = tireData.length * barHeight + margin.top + margin.bottom;
   
-    const drivers = Array.from(new Set(tireData.map((d) => d.FullName)));
-    const maxLap = d3.max(tireData, (d) => d.EndLap);
-  
-    console.log("Drivers:", drivers);
-    console.log("Max Lap:", maxLap);
-  
     const svg = d3
       .select(svgRef.current)
       .attr("width", containerWidth)
@@ -64,6 +60,9 @@ const TireStrategyVisualization = () => {
   
     // Clear previous elements
     svg.selectAll("*").remove();
+
+    const maxLap = d3.max(tireData, (driver) => d3.sum(driver.Stints, (d) => d.StintLength))
+    const drivers = tireData.map((d) => d.Name)
   
     const g = svg
       .append("g")
@@ -74,29 +73,14 @@ const TireStrategyVisualization = () => {
       .scaleLinear()
       .domain([0, maxLap])
       .range([0, containerWidth - margin.left - margin.right]);
-  
+      
     const yScale = d3
       .scaleBand()
       .domain(drivers)
       .range([0, drivers.length * barHeight])
       .padding(0.2);
-  
-    console.log("xScale domain:", xScale.domain(), "range:", xScale.range());
-    console.log("yScale domain:", yScale.domain(), "range:", yScale.range());
-  
-    // Add bars for tire stints
-    g.selectAll(".bar")
-      .data(tireData)
-      .enter()
-      .append("rect")
-      .attr("x", (d) => xScale(d.StartLap))
-      .attr("y", (d) => yScale(d.FullName))
-      .attr("width", (d) => xScale(d.EndLap) - xScale(d.StartLap))
-      .attr("height", yScale.bandwidth())
-      .attr("fill", (d) => compoundColors[d.Compound] || "#ddd")
-      .attr("stroke", "black");
-  
-      g.append("g")
+      
+    g.append("g")
       .attr("transform", `translate(0, ${drivers.length * barHeight})`)
       .call(d3.axisBottom(xScale).ticks(10).tickFormat((d) => d))
       .selectAll("text")
@@ -110,13 +94,35 @@ const TireStrategyVisualization = () => {
       .style("font-size", "16px")
       .style("font-weight", "bold")
       .text("Lap Number");
-
-
+  
     // Add Y-axis
     g.append("g")
       .call(d3.axisLeft(yScale).tickSize(0))
       .selectAll("text")
       .style("font-size", "12px");
+
+    // Draw bars
+    const driverGroups = svg.selectAll(".driver-group")
+      .data(tireData)
+      .enter()
+      .append("g")
+      .attr("class", "driver-group")
+      .attr("transform", d => `translate(${margin.left},${yScale(d.Name)  + margin.top})`);
+
+    driverGroups.each(function (d) {
+        let cumulativeLength = 0;
+        d3.select(this)
+            .selectAll("rect")
+            .data(d.Stints)
+            .enter()
+            .append("rect")
+            .attr("x", stint => xScale(cumulativeLength += stint.StintLength) - xScale(stint.StintLength))
+            .attr("y", 0)
+            .attr("height", yScale.bandwidth())
+            .attr("width", stint => xScale(stint.StintLength))
+            .attr("fill", stint => stint.CompoundColor);
+    });
+  
   }, [tireData]);
 
 
