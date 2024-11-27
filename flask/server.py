@@ -49,16 +49,16 @@ ERROR_RESPONSE = json.dumps({
 @app.route('/api/f1-standings', methods=['GET'])
 def getStandings():
     year = request.args.get("year")
-    circuit = request.args.get("circuit")
+    race = request.args.get("race")
     session = request.args.get("session")
 
-    print("Year:", year, "Circuit:", circuit, "Session:", session)
+    print("Year:", year, "Race:", race, "Session:", session)
     
-    if not year or not circuit or not session:
+    if not year or not race or not session:
         return jsonify({"error": "Missing required parameters"}), 400
 
     try:
-        response = service.getStandingsData(int(year), circuit, session)
+        response = service.getStandingsData(int(year), race, session)
         return jsonify(response), 200
     except Exception as e:
         logging.error("Error fetching standings data: %s", str(e)) 
@@ -119,6 +119,6 @@ def getTimes():
 
 if __name__ == '__main__':
     if os.environ.get("ENVIRONMENT") == "DEPLOYMENT":
-        app.run(host='0.0.0.0',port=4000)
+        app.run(host='0.0.0.0',port=5000)
     else:
         app.run(debug=True)

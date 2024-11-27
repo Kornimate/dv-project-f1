@@ -204,7 +204,6 @@ const RaceStandings = ({ year, race}) => {
 
     return (
         <div>
-            <h1>{year} - {race} - Race Standings</h1>
             {error && <div style={{ color: "red" }}>{error}</div>}
             {loading ? (
                 <CircularProgress />
