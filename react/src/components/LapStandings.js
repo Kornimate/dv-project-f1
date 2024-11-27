@@ -3,7 +3,6 @@ import { useEffect, useState, useMemo } from 'react';
 import { useSearchParams, useNavigate, useLocation } from 'react-router-dom'; 
 import { YEARS, DEV_URL } from '../shared-resources/constants';
 import axios from 'axios';
-import LapTimesVisualization from './LapTimesVisualization';
 import RaceStandings from './RaceStandings';
 
 const LapStandings = () => {
