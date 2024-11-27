@@ -33,8 +33,8 @@ const formatPosition = (position) => {
 };
 
 
-const RaceStandings = ({ year, circuit}) => {
-    const raceInfo = useMemo(() => ({ year, circuit, session: 'Race' }), [year, circuit]);
+const RaceStandings = ({ year, race}) => {
+    const raceInfo = useMemo(() => ({ year, race, session: 'Race' }), [year, race]);
     const url = useMemo(() => process.env.API_URL || DEV_URL, []);
     const [data, setData] = useState([]);
     const [error, setError] = useState('');
@@ -204,7 +204,7 @@ const RaceStandings = ({ year, circuit}) => {
 
     return (
         <div>
-            <h1>{year} - {circuit} - Race Standings</h1>
+            <h1>{year} - {race} - Race Standings</h1>
             {error && <div style={{ color: "red" }}>{error}</div>}
             {loading ? (
                 <CircularProgress />
