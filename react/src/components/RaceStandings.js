@@ -208,7 +208,7 @@ const RaceStandings = ({ year, race}) => {
             {loading ? (
                 <CircularProgress />
             ) : (
-                <svg id="race-standings-chart" style={{ left:0}} ></svg>
+                <svg id="race-standings-chart" ></svg>
             )}
         </div>
     );
