@@ -203,12 +203,12 @@ const RaceStandings = ({ year, race}) => {
     };
 
     return (
-        <div>
+        <div style={{ marginTop: "20px" }}>
             {error && <div style={{ color: "red" }}>{error}</div>}
             {loading ? (
                 <CircularProgress />
             ) : (
-                <svg id="race-standings-chart"></svg>
+                <svg id="race-standings-chart" style={{ left:0}} ></svg>
             )}
         </div>
     );
