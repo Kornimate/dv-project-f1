@@ -1,12 +1,12 @@
 import './App.css';
 import RaceResults from './components/RaceResults.js';
 import RaceStandings from './components/RaceStandings';
-import YearCircuit from './components/YearCircuit';
+import LapStandings from './components/LapStandings';
 
 function App() {
   return (
     <div className="App">
-      <YearCircuit />
+      <LapStandings />
     </div>
   );
 }
