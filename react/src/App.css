@@ -41,15 +41,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  height: auto; /* Adjust dynamically to content */
+  justify-content: center;
+  height: 100vh;
   margin: 0 auto;
   padding: 0;
-  width: 90vw; /* Make chart wider */
+  width: 100%;
   overflow: hidden; /* Prevent unnecessary scrolling */
+  position: relative;
 }
+
 
 svg {
   display: block;
   margin: auto; /* Center the chart horizontally */
+  max-height: 100%;
 }
