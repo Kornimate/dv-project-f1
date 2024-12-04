@@ -58,7 +58,7 @@ def getStandings():
         return jsonify({"error": "Missing required parameters"}), 400
 
     try:
-        response = service.getStandingsData(int(year), race, session)
+        response = service.getStandingsData(int(year), int(race), session)
         return jsonify(response), 200
     except Exception as e:
         logging.error("Error fetching standings data: %s", str(e)) 
