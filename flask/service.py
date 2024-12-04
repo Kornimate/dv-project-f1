@@ -11,12 +11,27 @@ def getSessionData(year, circuit, session):
     return session.results
 
 
-def getStandingsData(year, circuit, session):
-    logging.info("Fetching standings data for Year: %d, Circuit: %s, Session: %s", year, circuit, session)
+def getStandingsData(year, circuit, session_type):
+    """
+    Fetch and return the standings data for a given F1 race session.
+    Includes debugging to verify race selection and data loading.
 
+    Args:
+        year (int): The year of the race season.
+        circuit (str): The circuit name or event name.
+        session_type (str): The session type ('R' for Race, 'Q' for Qualifying, etc.).
+
+    Returns:
+        list: A list of standings data for each lap and final results.
+    """
+    logging.info("Fetching standings data for Year: %d, Circuit: %s, Session: %s", year, circuit, session_type)
+    print(f"Input Parameters - Year: {year}, Circuit: {circuit}, Session: {session_type}")
+    
     try:
-        session = fastf1.get_session(year, circuit, session)
-        session.load(telemetry=False, laps=True, weather= False)
+        # Load the session
+        session = fastf1.get_session(year, circuit, session_type)
+        print(f"Loaded Event: {session.event['EventName']}, Date: {session.date}")
+        session.load(telemetry=False, laps=True, weather=False)
         logging.info("Data loaded successfully.")
     except Exception as e:
         logging.error("Error loading session data: %s", str(e))
@@ -25,17 +40,26 @@ def getStandingsData(year, circuit, session):
     standings = []
     processed_laps = set()
 
+    # Debug: Check if laps are available
     if session.laps.empty:
         logging.warning("No lap data available for the session.")
+        print(f"No lap data available for {year} {circuit} ({session_type}).")
         return standings
 
+    # Debug: Calculate and print total laps
+    total_laps = session.laps['LapNumber'].max()
+    print(f"Total laps for {year} {circuit} ({session_type}): {total_laps}")
+
+    # Retrieve all drivers
     all_drivers = session.laps['Driver'].unique()
 
+    # Grid positions from results
     grid_positions = {
         result.Abbreviation: result.GridPosition
         for result in session.results.itertuples()
     }
 
+    # Add initial grid positions to standings
     lap_data_dict = {"lap": 0}
     for driver_id in all_drivers:
         team_name = session.results.loc[session.results['Abbreviation'] == driver_id, 'TeamName'].values[0]
@@ -45,6 +69,7 @@ def getStandingsData(year, circuit, session):
         }
     standings.append(lap_data_dict)
 
+    # Process lap data
     for lap_index, lap_data in session.laps.iterrows():
         lap_number = lap_data['LapNumber']
         
@@ -70,7 +95,7 @@ def getStandingsData(year, circuit, session):
 
         standings.append(lap_data_dict)
     
-   
+    # Add final standings
     final_standings = {"lap": "Final Results"}
     for result in session.results.itertuples():
         driver = getattr(result, 'Abbreviation', None)

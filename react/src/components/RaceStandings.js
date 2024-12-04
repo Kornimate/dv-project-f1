@@ -5,23 +5,23 @@ import * as d3 from "d3";
 import CircularProgress from '@mui/material/CircularProgress';
 
 const teamColors = {
-    "Ferrari": "#F50000",          // Red
-    "Mercedes": "#00D2BE",         // Tirqruise
-    "Red Bull Racing": "#051EA8",  // Blue
-    "McLaren": "#FF8700",          // Orange
-    "Alpine": "#F596C8",           // Blue 
-    "Aston Martin": "#006F62",     // Dark green 
-    "Williams": "#005AFF",         // Blue
-    "AlphaTauri": "#2B4562",       // Dark blue
-    "Alfa Romeo": "#900000",       // Dark red
-    "Alfa Romeo Racing": "#900000",// Dark red
-    "Kick Sauber": "#00FF1E",      // Glowing Green
-    "Sauber": "#900000",           // Dark red
-    "Haas F1 Team": "#B6BABD",     // Grey
-    "Racing Point": "#F596C8",     // Pink
-    "Renault": "#FFF500",          // Yellow 
-    "Toro Rosso": "#2B4562",       // Blue 
-    "RB": "#2B4562"                // Toro Rosso Blue
+    "Ferrari": "#FF4C4C",            // Brightened Red
+"Mercedes": "#00B8A9",           // Muted Turquoise
+"Red Bull Racing": "#2E3AFF",    // Vibrant Blue
+"McLaren": "#FF9E3E",            // Brighter Orange
+"Alpine": "#FF9FD5",             // More vibrant Pink-Blue
+"Aston Martin": "#228773",       // Slightly brighter Dark Green
+"Williams": "#236EFF",           // Lighter Blue
+"AlphaTauri": "#455A7F",         // More distinct Dark Blue
+"Alfa Romeo": "#B00000",         // Brighter Dark Red
+"Alfa Romeo Racing": "#B00000",  // Brighter Dark Red
+"Kick Sauber": "#2AFF4D",        // Softer Glowing Green
+"Sauber": "#B00000",             // Brighter Dark Red
+"Haas F1 Team": "#D0D3D6",       // Brighter Grey
+"Racing Point": "#FFABD9",       // Brighter Pink
+"Renault": "#FFF83E",            // Softer Yellow
+"Toro Rosso": "#456A8A",         // Brighter Blue
+"RB": "#456A8A"                  // Toro Rosso Blue
 };
 
 
