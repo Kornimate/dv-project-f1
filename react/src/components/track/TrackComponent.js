@@ -1,8 +1,9 @@
 import { useState, useRef } from 'react';
 import TrackDataProvider from './TrackDataProvider';
-import TrackView from './TrackView';
 import LineChart from './LineChart';
 import {DRIVERS2024} from "../../shared-resources/constants";
+import ComparisonTrackView from "./ComparisonTrackView";
+import SingleDriverTrackView from "./SingleDriverTrackView";
 
 const TrackComponent = () => {
     const [viewType, setViewType] = useState('line');
@@ -10,7 +11,7 @@ const TrackComponent = () => {
     const [comparisonMode, setComparisonMode] = useState(false);
 
     const [driver1, setDriver1] = useState('VER'); // Default to Max Verstappen
-    const [driver2, setDriver2] = useState('HAM'); // Default to Lewis Hamilton
+    const [driver2, setDriver2] = useState('VER'); // Default to Lewis Hamilton
     const [raceInfo] = useState({ year: 2024, circuit: 'Spa', session: 'Q' });
 
 
@@ -40,6 +41,16 @@ const TrackComponent = () => {
         <TrackDataProvider raceInfo={raceInfo} driver1={driver1} driver2={driver2} colorAttribute={colorAttribute}>
             {({ data, error, loading }) => (
                 <>
+                    <div ref={tooltipRef} style={{
+                        position: 'absolute',
+                        display: 'none',
+                        background: 'white',
+                        padding: '5px',
+                        border: '1px solid gray',
+                        borderRadius: '4px',
+                        pointerEvents: 'none',
+                        zIndex: 10
+                    }}></div>
                     <div>
                         <label>Choose Driver 1:</label>
                         <select onChange={handleDriver1Change} value={driver1}>
@@ -81,9 +92,15 @@ const TrackComponent = () => {
                     ) : error ? (
                         <div>Error: {error}</div>
                     ) : viewType === 'track' ? (
-                        <TrackView data={data} driver1={driver1} driver2={driver2} colorAttribute={colorAttribute} tooltipRef={tooltipRef} comparisonMode={comparisonMode} />
+                        comparisonMode ? (
+                            <ComparisonTrackView data={data} driver1={driver1} driver2={driver2}
+                                                 colorAttribute={colorAttribute} tooltipRef={tooltipRef}/>
+                        ) : (
+                            <SingleDriverTrackView data={data} driver1={driver1} colorAttribute={colorAttribute}
+                                                   tooltipRef={tooltipRef}/>
+                        )
                     ) : (
-                        <LineChart data={data} driver1={driver1} driver2={driver2} colorAttribute={colorAttribute} />
+                        <LineChart data={data} driver1={driver1} driver2={driver2} colorAttribute={colorAttribute}/>
                     )}
                 </>
             )}

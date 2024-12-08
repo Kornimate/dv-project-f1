@@ -12,3 +12,9 @@ def get_fastest_lap(year, circuit, session, driver):
     data = session.laps.pick_driver(driver).pick_fastest().get_telemetry()
     data.add_distance()
     return data
+
+def get_track_info(year, circuit, session):
+    session = fastf1.get_session(year, circuit, session)
+    session.load(weather=False)
+    data = session.get_circuit_info().marshal_sectors
+    return data

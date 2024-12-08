@@ -11,6 +11,7 @@ const DRIVERS2024 = [
     { code: 'RIC', name: 'Daniel Ricciardo' },
     { code: 'ZHO', name: 'Zhou Guanyu' },
     { code: 'TSU', name: 'Yuki Tsunoda' },
+    { code: 'NOR', name: 'Lando Norris' },
 ];
 
 

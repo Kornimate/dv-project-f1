@@ -51,6 +51,14 @@ def get_fastest_lap():
     except:
         return Response(ERROR_RESPONSE, status=500, mimetype='application/json')
 
+@app.route("/api/track-info", methods=['GET'])
+def get_track_info():
+    try:
+        response = service.get_track_info(int(request.args["year"]), request.args["circuit"], request.args["session"])
+        return jsonify(response.to_json(orient = "records"))
+    except:
+        return Response(ERROR_RESPONSE, status=500, mimetype='application/json')
+
 if __name__ == '__main__':
     if os.environ.get("ENVIRONMENT") == "DEPLOYMENT":
         app.run(host='0.0.0.0',port=5000)

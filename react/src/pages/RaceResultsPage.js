@@ -1,10 +1,9 @@
+import TrackComponent from "../components/track/TrackComponent";
 
 const RaceResultsPage = () => {
     return (
-        <div>
-            {/* Race results component comes here */}
-        </div>
+        <TrackComponent/>
     )
 }
 
-export default RaceResultsPage;
+export default RaceResultsPage
