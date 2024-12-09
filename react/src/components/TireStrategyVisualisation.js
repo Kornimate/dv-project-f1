@@ -2,16 +2,18 @@ import React, { useEffect, useRef, useState, useMemo } from "react";
 import * as d3 from "d3";
 import axios from "axios";
 import { DEV_URL } from "../shared-resources/constants.js";
+import { MenuItem, FormControl, Select, InputLabel } from "@mui/material";
 
-const TireStrategyVisualization = () => {
-  const raceInfo = useMemo(
-    () => ({
-      year: 2023,
-      circuit: "Australia",
-      session: "R",
-    }),
-    []
-  );
+
+const TireStrategyVisualization = ({ year, race}) => {
+  const raceInfo = useMemo(() => ({ year, race, session: 'Race' }), [year, race]);
+  const url = useMemo(() => process.env.API_URL || DEV_URL, []);
+  const [data, setData] = useState([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const [circuits, setCircuits] = useState([]);
+  const [sessions] = useState(["FP1", "FP2", "FP3", "Q", "R"]);
 
   const mergeConsecutiveStints = (data) => {
     return data.map((driver) => {
