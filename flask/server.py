@@ -5,6 +5,7 @@ import os
 import json
 import fastf1
 from service import getSessionData
+import logging
 
 
 app = Flask(__name__)
@@ -67,6 +68,35 @@ def getData():
         return jsonify(response.to_json(orient = "records"))
     except:
         return Response(ERROR_RESPONSE, status=500, mimetype='application/json')
+    
+
+@app.route("/api/f1-circuits", methods=["GET"])
+def get_circuits():
+    year = request.args.get("year", type=int)
+    if not year:
+        return jsonify({"error": "Year is required"}), 400
+    
+    circuits = service.getCircuitsByYear(year)
+    return jsonify({"circuits": circuits})
+
+
+@app.route('/api/f1-standings', methods=['GET'])
+def getStandings():
+    year = request.args.get("year")
+    race = request.args.get("race")
+    session = request.args.get("session")
+
+    print("Year:", year, "Race:", race, "Session:", session)
+    
+    if not year or not race or not session:
+        return jsonify({"error": "Missing required parameters"}), 400
+
+    try:
+        response = service.getStandingsData(int(year), int(race), session)
+        return jsonify(response), 200
+    except Exception as e:
+        logging.error("Error fetching standings data: %s", str(e)) 
+        return jsonify({"error": "Internal Server Error"}), 500
 
 
 @app.route("/api/tire-strategy", methods=['GET'])
@@ -88,6 +118,15 @@ def get_tire_strategy():
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/api/calendar-year-races", methods=['GET'])
+def getRaces():
+    try:
+        response = service.getRacesForYear(int(request.args.get("year")))
+        return jsonify(response)
+    except:
+        return Response(ERROR_RESPONSE, status=500, mimetype="application/json")
+
 
 if __name__ == '__main__':
     if os.environ.get("ENVIRONMENT") == "DEPLOYMENT":
