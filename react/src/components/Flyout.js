@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import { List, Box, IconButton, Drawer } from "@mui/material";
 import  MenuIcon  from '@mui/icons-material/Menu'
@@ -26,7 +27,7 @@ const Flyout = () => {
                 aria-label="menu"
                 sx={{ mr: 2 }}
                 onClick={toggleDrawer(true)}>
-                <MenuIcon />
+                <MenuIcon sx={{color: 'black'}}/>
             </IconButton>
             <Drawer open={open} onClose={toggleDrawer(false)} sx={{'& .MuiDrawer-paper': { backgroundColor: '#C0C0C0'}}}>
                 <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>

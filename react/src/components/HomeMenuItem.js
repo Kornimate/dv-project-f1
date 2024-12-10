@@ -4,7 +4,7 @@ import { Card, CardMedia, CardContent, Typography, Divider } from "@mui/material
 const HomeMenuItem = ({url, title, img}) => {
     return (
         <Link to={url} style={{textDecoration: 'none', color: 'black'}}>
-            <Card sx={{ 
+            <Card sx={{
                 width: 200,
                 '&:hover': {
                     boxShadow: 20,
@@ -15,18 +15,18 @@ const HomeMenuItem = ({url, title, img}) => {
                 borderWidth: 3,
                 borderColor: '#1C1C1E'
             }}
-            variant="outlined">
-            <CardMedia
-                sx={{ height: 200, marginBottom: 5 }}
-                image={img}
-                title={title}
-            />
-            <Divider />
-            <CardContent sx={{alignContent: 'center'}}>
-                <Typography gutterBottom variant="h5" component="div" sx={{ textDecoration: 'none' }}>
-                    {title}
-                </Typography>
-            </CardContent>
+                  variant="outlined">
+                <CardMedia
+                    sx={{ height: 200, marginBottom: 5 }}
+                    image={img}
+                    title={title}
+                />
+                <Divider />
+                <CardContent sx={{alignContent: 'center'}}>
+                    <Typography gutterBottom variant="h5" component="div" sx={{ textDecoration: 'none' }}>
+                        {title}
+                    </Typography>
+                </CardContent>
             </Card>
         </Link>
     );

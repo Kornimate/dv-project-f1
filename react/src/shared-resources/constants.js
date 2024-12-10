@@ -14,5 +14,16 @@ const DRIVERS2024 = [
     { code: 'NOR', name: 'Lando Norris' },
 ];
 
+const YEARS = (() => {
+    const current = (new Date()).getFullYear();
+    const years = [];
 
-export {DEV_URL, DRIVERS2024}
+    for(let i = current;i > 2018; i--){
+        years.push(i)
+    }
+
+    return years;
+})()
+
+
+export {DEV_URL, DRIVERS2024, YEARS}

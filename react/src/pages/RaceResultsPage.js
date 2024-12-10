@@ -1,8 +1,7 @@
-import TrackComponent from "../components/track/TrackComponent";
 
 const RaceResultsPage = () => {
     return (
-        <TrackComponent/>
+        {/* Race results component comes here */}
     )
 }
 

@@ -43,18 +43,51 @@ def get_data():
     except:
         return Response(ERROR_RESPONSE, status=500, mimetype='application/json')
 
+@app.route("/api/calendar-year-races", methods=['GET'])
+def getRaces():
+    try:
+        response = service.getRacesForYear(int(request.args.get("year")))
+        return jsonify(response)
+    except:
+        return Response(ERROR_RESPONSE, status=500, mimetype="application/json")
+
+@app.route("/api/pilots-for-race", methods=['GET'])
+def getDrivers():
+    try:
+        response = service.getDriversForRace(int(request.args.get("year")), int(request.args.get("race")))
+        return jsonify(response)
+    except:
+        return Response(ERROR_RESPONSE, status=500, mimetype="application/json")
+
+@app.route("/api/pilots-times-for-race", methods=['GET'])
+def getTimes():
+    try:
+        response = service.getRaceLapTimesForDrivers(int(request.args.get("year")), int(request.args.get("race")), request.args.get("racer1"), request.args.get("racer2"))
+        return jsonify(response)
+    except:
+        return Response(ERROR_RESPONSE, status=500, mimetype="application/json")
+
 @app.route("/api/f1-fastest-lap", methods=['GET'])
 def get_fastest_lap():
     try:
-        response = service.get_fastest_lap(int(request.args["year"]), request.args["circuit"], request.args["session"], request.args["driver"])
+        response = service.get_fastest_lap(int(request.args["year"]), int(request.args["circuit"]), request.args["session"], request.args["driver"])
         return jsonify(response.to_json(orient = "records"))
     except:
         return Response(ERROR_RESPONSE, status=500, mimetype='application/json')
 
+@app.route("/api/f1-lap", methods=['GET'])
+def get_lap():
+    try:
+        response = service.get_lap(int(request.args["year"]), int(request.args["circuit"]), request.args["session"], request.args["driver"], int(request.args["lap"]))
+        return jsonify(response.to_json(orient = "records"))
+    except:
+        return Response(ERROR_RESPONSE, status=500, mimetype='application/json')
+
+
 @app.route("/api/track-info", methods=['GET'])
 def get_track_info():
     try:
-        response = service.get_track_info(int(request.args["year"]), request.args["circuit"], request.args["session"])
+        response = service.get_track_info(int(request.args["year"]), int(request.args["circuit"]), request.args["session"])
         return jsonify(response.to_json(orient = "records"))
     except:
         return Response(ERROR_RESPONSE, status=500, mimetype='application/json')

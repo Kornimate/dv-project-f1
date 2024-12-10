@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import axios from 'axios';
 import { DEV_URL } from "../shared-resources/constants.js";
 import TrackVisualization from "./TrackVisualization";
-import LapDataChart from "./LapDataChart";
+import LapDataChart from "./LapTimesGraph";
 
 const RaceSessionWrapper = () => {
     const [data, setData] = useState([]);

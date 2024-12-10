@@ -9,20 +9,20 @@ const FlyoutItem = ({text, url,  img, icon}) => {
                 <ListItemButton sx={{'&:hover': { backgroundColor: '#C0C0C0'}}}>
                     <ListItemIcon>
                         { icon === null || icon === undefined ? <Box
-                        component="img"
-                        sx={{
-                            height: '10vh',
-                            width: '10vh',
-                            maxHeight: { xs: 233, md: 167 },
-                            maxWidth: { xs: 350, md: 250 },
-                        }}
-                        alt="The house from the offer."
-                        src={img}
-                        />
-                    :
-                    icon}
+                                component="img"
+                                sx={{
+                                    height: '10vh',
+                                    width: '10vh',
+                                    maxHeight: { xs: 233, md: 167 },
+                                    maxWidth: { xs: 350, md: 250 },
+                                }}
+                                alt="The house from the offer."
+                                src={img}
+                            />
+                            :
+                            icon}
                     </ListItemIcon>
-                <ListItemText primary={text} sx={{color: 'black'}}/>
+                    <ListItemText primary={text} sx={{color: 'black'}}/>
                 </ListItemButton>
             </ListItem>
         </Link>

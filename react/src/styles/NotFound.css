@@ -5,8 +5,8 @@ button {
     border: 6px solid transparent;
     transition: border-color 0.3s ease;
     border-radius: 10px;
-  }
-  
-  button:hover {
+}
+
+button:hover {
     border-color: #1C1C1E;
-  }
+}

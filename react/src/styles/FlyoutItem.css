@@ -6,9 +6,9 @@
     position: relative;
     display: inline-block;
     overflow: hidden;
-  }
-  
-  .fl-item::after {
+}
+
+.fl-item::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -19,15 +19,15 @@
     background-size: 200% auto;
     transition: all .5s;
     transform: translateX(-100%);
-  }
-  
-  .fl-item:hover::after {
+}
+
+.fl-item:hover::after {
     transform: translateX(0%);
     animation: gradient-89 3s linear infinite;
-  }
-  
-  @keyframes gradient-89 {
+}
+
+@keyframes gradient-89 {
     0% { background-position: 100% 0%; }
     50% { background-position: 0% 0%; }
     100% { background-position: 100% 0%; }
-  }
+}
