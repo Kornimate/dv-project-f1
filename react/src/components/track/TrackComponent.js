@@ -217,7 +217,7 @@ const TrackComponent = () => {
                                 )
                             ) : (
                                 <LineChart data={data} driver1={params.driver1} driver2={params.driver2}
-                                           colorAttribute={colorAttribute}/>
+                                           colorAttribute={colorAttribute} tooltipRef={tooltipRef}/>
                             )}
                         </div>
                     </div>

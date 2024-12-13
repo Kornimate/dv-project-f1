@@ -169,6 +169,80 @@ const SingleDriverTrackView = ({ data, driver1, colorAttribute, tooltipRef, reve
         });
     };
 
+    const addLegend = (svg, colorScale, colorAttribute, width, height) => {
+        const legendGroup = svg.append("g").attr("class", "legend");
+        const legendWidth = 20;
+        const legendHeight = 300;
+        const legendX = width - 50; // Right side of the SVG
+        const legendY = (height - legendHeight) / 2;
+
+        const gradientId = "color-gradient";
+
+        // Define gradient for legend
+        const defs = svg.append("defs");
+        const linearGradient = defs.append("linearGradient")
+            .attr("id", gradientId)
+            .attr("x1", "0%")
+            .attr("y1", "100%") // Top to bottom gradient
+            .attr("x2", "0%")
+            .attr("y2", "0%");
+
+        const colorDomain = colorScale.domain();
+        const numStops = 10;
+        const stops = d3.range(numStops).map((i) => ({
+            offset: `${(i / (numStops - 1)) * 100}%`,
+            color: colorScale(colorDomain[0] + ((colorDomain[1] - colorDomain[0]) * i) / (numStops - 1)),
+        }));
+
+        stops.forEach((stop) => {
+            linearGradient.append("stop")
+                .attr("offset", stop.offset)
+                .attr("stop-color", stop.color);
+        });
+
+        // Draw border around the legend
+        legendGroup.append("rect")
+            .attr("x", legendX - 5)
+            .attr("y", legendY - 5)
+            .attr("width", legendWidth + 10)
+            .attr("height", legendHeight + 10)
+            .style("fill", "none")
+            .style("stroke", "black")
+            .style("stroke-width", 1);
+
+        // Draw legend rectangle
+        legendGroup.append("rect")
+            .attr("x", legendX)
+            .attr("y", legendY)
+            .attr("width", legendWidth)
+            .attr("height", legendHeight)
+            .style("fill", `url(#${gradientId})`);
+
+        // Add labels for legend
+        legendGroup.append("text")
+            .attr("x", legendX + legendWidth + 10)
+            .attr("y", legendY)
+            .text(colorDomain[1].toFixed(2))
+            .style("dominant-baseline", "middle")
+            .style("text-anchor", "start");
+
+        legendGroup.append("text")
+            .attr("x", legendX + legendWidth + 10)
+            .attr("y", legendY + legendHeight)
+            .text(colorDomain[0].toFixed(2))
+            .style("dominant-baseline", "middle")
+            .style("text-anchor", "start");
+
+        legendGroup.append("text")
+            .attr("x", legendX + legendWidth + 10)
+            .attr("y", legendY + legendHeight / 2)
+            .text(colorAttribute)
+            .style("dominant-baseline", "middle")
+            .style("text-anchor", "start")
+            .style("font-weight", "bold");
+    };
+
+
     useEffect(() => {
         const svg = d3.select(svgRef.current);
         const tooltip = d3.select(tooltipRef.current);
@@ -192,7 +266,8 @@ const SingleDriverTrackView = ({ data, driver1, colorAttribute, tooltipRef, reve
         const polygons = generatePolygons(smoothedData, transformedXScale, transformedYScale, lineWidth);
 
         drawPolygons(svg, polygons, smoothedData, colorScale, colorAttribute, tooltip, tooltipRef, lineWidth, transformedXScale, transformedYScale);
-    }, [data, colorAttribute]);
+        addLegend(svg, colorScale, colorAttribute, width, height);
+        }, [data, colorAttribute]);
 
     return (
         <div style={{ position: "relative" }}>
