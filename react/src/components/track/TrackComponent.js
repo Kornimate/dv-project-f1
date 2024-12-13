@@ -26,10 +26,10 @@ const TrackComponent = () => {
     const [racers, setRacers] = useState([]);
 
     const [params, setParams] = useState({
-        year: '',
-        race: '',
-        driver1: '',
-        driver2: '',
+        year: '2024',
+        race: '1',
+        driver1: 'VER',
+        driver2: 'HAM',
         lap1: '',
         lap2: '',
         fastest: true,
@@ -65,25 +65,9 @@ const TrackComponent = () => {
         }
 
         setLoading(false);
-    }, [params]);
+    }, []);
 
     const updateParam = (key, value) => {
-        if (key === 'driver1') {
-            if(value !== '' && value === params.driver2){
-                alert('Choose different pilots for comparison!');
-                return;
-            }
-        }
-
-        if (key === 'driver2') {
-            if(value !== '' && value === params.driver1){
-                alert('Choose different pilots for comparison!');
-                console.log(2)
-                return;
-            }
-        }
-
-
         const updatedParams = { ...params, [key]: value, fastest: true };
         setParams(updatedParams);
 
@@ -102,32 +86,10 @@ const TrackComponent = () => {
                 }
             });
 
-            console.log(response.data)
-
             setRaces(response.data)
         }
         getRaces();
     }, [params.year, url]);
-
-    useEffect(() => {
-        async function getRacers(){
-            if(params.year === 0 || isNaN(params.year) || params.year === '' || params.year === undefined ||
-                params.year === null || params.race === '' || params.race=== undefined || params.race === null)
-                return;
-
-            const response = await axios.get(`${url}/pilots-for-race`,{
-                params : {
-                    year : params.year,
-                    race: params.race
-                }
-            });
-
-            setRacers(response.data)
-        }
-
-        getRacers();
-
-    }, [params.year, params.race, url]);
 
     const handleColorAttributeChange = (e) => {
         setColorAttribute(e.target.value);
@@ -156,9 +118,6 @@ const TrackComponent = () => {
                             <label className={styles.label}>Choose Year:</label>
                             <select className={styles.selectDropdown}
                                     onChange={(e) => updateParam('year', e.target.value)} value={params.year}>
-                                <option value="" disabled>
-                                    Select a year
-                                </option>
                                 {YEARS.map(y => (
                                     <option key={y} value={y}>
                                         {y}
@@ -168,7 +127,7 @@ const TrackComponent = () => {
                         </div>
 
                         <div className={styles.dropdownContainer}>
-                        <label className={styles.label}>Choose Year:</label>
+                            <label className={styles.label}>Choose Year:</label>
                             <select className={styles.selectDropdown}
                                     onChange={(e) => updateParam('race', e.target.value)} value={params.race || ''}>
                                 <option value="" disabled>
@@ -187,11 +146,8 @@ const TrackComponent = () => {
                             <label className={styles.label}>Choose Driver 1:</label>
                             <select className={styles.selectDropdown}
                                     onChange={(e) => updateParam('driver1', e.target.value)} value={params.driver1}>
-                                <option value="" disabled>
-                                    Select a driver
-                                </option>
-                                {racers.map(driver => (
-                                    <option key={driver.name} value={driver.name}>
+                                {DRIVERS2024.map(driver => (
+                                    <option key={driver.code} value={driver.code}>
                                         {driver.name}
                                     </option>
                                 ))}
@@ -199,14 +155,11 @@ const TrackComponent = () => {
                         </div>
 
                         <div className={styles.dropdownContainer}>
-                        <label className={styles.label}>Choose Driver 2:</label>
+                            <label className={styles.label}>Choose Driver 2:</label>
                             <select className={styles.selectDropdown}
                                     onChange={(e) => updateParam('driver2', e.target.value)} value={params.driver2}>
-                                <option value="" disabled>
-                                    Select a driver
-                                </option>
-                                {racers.map(driver => (
-                                    <option key={driver.name} value={driver.name}>
+                                {DRIVERS2024.map(driver => (
+                                    <option key={driver.code} value={driver.code}>
                                         {driver.name}
                                     </option>
                                 ))}
@@ -214,7 +167,7 @@ const TrackComponent = () => {
                         </div>
 
                         <div className={styles.dropdownContainer}>
-                        <label className={styles.label}>Choose Data:</label>
+                            <label className={styles.label}>Choose Data:</label>
                             <select className={styles.comparisonDropdown} onChange={handleColorAttributeChange}
                                     value={colorAttribute}>
                                 <option value="Speed">Speed (km/h)</option>
