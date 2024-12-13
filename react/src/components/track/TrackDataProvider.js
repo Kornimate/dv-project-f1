@@ -15,62 +15,63 @@ const TrackDataProvider = ({ raceInfo, driver1, driver2, lap1, lap2, fastest, ch
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        console.log(raceInfo)
         const fetchData = async () => {
             setLoading(true);
-            try {
-                const getDriverLapUrl = (driver, lap) =>
-                    fastest
-                        ? `${url}/f1-fastest-lap`
-                        : `${url}/f1-lap`;
+            if (driver1 !== '' && driver2 !== '') {
+                try {
+                    const getDriverLapUrl = (driver, lap) =>
+                        fastest
+                            ? `${url}/f1-fastest-lap`
+                            : `${url}/f1-lap`;
 
-                const getDriverLapParams = (driver, lap) =>
-                    fastest
-                        ? {...raceInfo, driver}
-                        : {...raceInfo, driver, lap};
+                    const getDriverLapParams = (driver, lap) =>
+                        fastest
+                            ? {...raceInfo, driver}
+                            : {...raceInfo, driver, lap};
 
-                const requests = [
-                    await axios.get(getDriverLapUrl(driver1, lap1), {
-                        params: getDriverLapParams(driver1, lap1),
-                    }),
-                    await axios.get(getDriverLapUrl(driver2, lap2), {
-                        params: getDriverLapParams(driver2, lap2),
-                    }),
-                    await axios.get(`${url}/track-info`, {params: {...raceInfo}}),
-                ];
+                    const requests = [
+                        await axios.get(getDriverLapUrl(driver1, lap1), {
+                            params: getDriverLapParams(driver1, lap1),
+                        }),
+                        await axios.get(getDriverLapUrl(driver2, lap2), {
+                            params: getDriverLapParams(driver2, lap2),
+                        }),
+                        await axios.get(`${url}/track-info`, {params: {...raceInfo}}),
+                    ];
 
-                const [response1, response2, response3] = await Promise.all(requests);
+                    const [response1, response2, response3] = await Promise.all(requests);
 
-                if (
-                    response1.status === 200 &&
-                    response2.status === 200 &&
-                    response3.status === 200
-                ) {
-                    const trackInfo = JSON.parse(response3.data);
+                    if (
+                        response1.status === 200 &&
+                        response2.status === 200 &&
+                        response3.status === 200
+                    ) {
+                        const trackInfo = JSON.parse(response3.data);
 
-                    const processedDriver1 = assignMarshalSectorsByDistance(
-                        JSON.parse(response1.data),
-                        trackInfo
-                    );
-                    const processedDriver2 = assignMarshalSectorsByDistance(
-                        JSON.parse(response2.data),
-                        trackInfo
-                    );
+                        const processedDriver1 = assignMarshalSectorsByDistance(
+                            JSON.parse(response1.data),
+                            trackInfo
+                        );
+                        const processedDriver2 = assignMarshalSectorsByDistance(
+                            JSON.parse(response2.data),
+                            trackInfo
+                        );
 
-                    setData({
-                        driver1: processedDriver1,
-                        driver2: processedDriver2,
-                        trackInfo: trackInfo,
-                    });
-                } else {
-                    setError(
-                        `Error fetching data: Driver1(${response1.status}), Driver2(${response2.status}), Track(${response3.status})`
-                    );
+                        setData({
+                            driver1: processedDriver1,
+                            driver2: processedDriver2,
+                            trackInfo: trackInfo,
+                        });
+                    } else {
+                        setError(
+                            `Error fetching data: Driver1(${response1.status}), Driver2(${response2.status}), Track(${response3.status})`
+                        );
+                    }
+                } catch (error) {
+                    setError(`Failed to fetch data: ${error.message}`);
+                } finally {
+                    setLoading(false);
                 }
-            } catch (error) {
-                setError(`Failed to fetch data: ${error.message}`);
-            } finally {
-                setLoading(false);
             }
         };
 

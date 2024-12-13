@@ -5,9 +5,8 @@
     grid-template-rows: auto; /* Dynamic height rows */
     gap: 20px;
     padding: 20px;
-    height: 100vh;
+    height: 100%;
     box-sizing: border-box;
-    background-color: #f5f5f5;
     font-family: Arial, sans-serif;
 }
 
@@ -117,70 +116,128 @@
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
+.chartContainer {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.contentContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.comparisonContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    background-color: #f9f9f9;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.comparisonDriverContainer {
+    display: flex;
+    flex-direction: column;
+    width: 500px;
+    padding: 20px;
+    gap: 20px;
+}
+
+.comparisonDriverName {
+    color: #ff4d4d;
+}
+
+.comparisonDriverRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 150px;
+}
+
 .tooltip {
     position: absolute;
-    display: none; /* Hidden by default */
-    background-color: #ffffff;
-    color: #333;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    pointer-events: none; /* Prevents interaction with the tooltip */
-    font-size: 14px;
-    z-index: 10;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    opacity: 0;
+    display: none;
+    background-color: rgba(0, 0, 0, 0.9); /* Darker background for better contrast */
+    color: white;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 12px;
+    line-height: 1.4;
+    pointer-events: none;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    width: 300px; /* Adjusted width to accommodate columns */
 }
 
-/* Tooltip visible state */
-.tooltipVisible {
-    display: block;
-    opacity: 1;
-    transform: translateY(0); /* Adjust for smooth animation */
+.tooltipSingle {
+    position: absolute;
+    display: none;
+    background-color: rgba(0, 0, 0, 0.9); /* Darker background for better contrast */
+    color: white;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 12px;
+    line-height: 1.4;
+    pointer-events: none;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    width: 150px;
 }
 
-/* Tooltip animation for hover */
-.tooltipHover {
-    animation: fadeIn 0.3s ease;
+.tooltipContent {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px; /* Slightly larger gap for clarity */
 }
 
-/* Tooltip fade-in keyframe */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.tooltipColumn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 30%; /* Evenly distribute column width */
 }
 
-/* Responsive tooltip */
-@media (max-width: 768px) {
-    .tooltip {
-        font-size: 12px;
-        padding: 6px 10px;
-    }
+.tooltipHeader {
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 5px;
+    font-size: 14px; /* Slightly larger font for headers */
+    color: #ff4d4d; /* Highlight headers with a gold color */
 }
 
-/* Responsive styles */
-@media (max-width: 768px) {
-    .trackVisualization {
-        max-width: 95%;
-    }
-
-    .button {
-        font-size: 12px;
-        padding: 8px 16px;
-    }
-
-    .selectDropdown {
-        font-size: 14px;
-    }
-
-    .comparisonDropdown {
-        font-size: 12px;
-    }
+.tooltipValue {
+    font-size: 13px;
+    font-weight: 400;
+    color: #ddd;
+    text-align: center;
 }
+
+.tooltipMiddle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 40%; /* Slightly wider middle column */
+}
+
+.tooltipMiddle .distance {
+    font-size: 10px;
+    font-weight: bold;
+    color: #ff4d4d; /* Highlight distance values */
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.tooltipMiddle .attribute {
+    font-size: 10px;
+    font-weight: 500;
+    color: #ffffff;
+    text-align: center;
+}
+

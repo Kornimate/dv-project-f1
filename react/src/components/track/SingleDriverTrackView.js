@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
 import * as d3 from "d3";
+import styles from "../../styles/TrackComponent.module.css";
 
-const SingleDriverTrackView = ({ data, driver1, colorAttribute, tooltipRef }) => {
+const SingleDriverTrackView = ({ data, driver1, colorAttribute, tooltipRef, reverseZIndex }) => {
     const svgRef = useRef();
 
     const setupSVG = (svg, width, height) => {
@@ -12,16 +13,23 @@ const SingleDriverTrackView = ({ data, driver1, colorAttribute, tooltipRef }) =>
     const createScales = (data, width, height, colorAttribute) => {
         const xScale = d3.scaleLinear()
             .domain(d3.extent(data, (d) => d.X))
-            .range([50, width - 50]);
+            .range([50, width - 50])
+            .nice()
+            .interpolate(d3.interpolateNumber);
 
         const yScale = d3.scaleLinear()
             .domain(d3.extent(data, (d) => d.Y))
-            .range([height - 50, 50]);
+            .range([height - 50, 50])
+            .nice()
+            .interpolate(d3.interpolateNumber);
 
         const colorScale = d3.scaleSequential(d3.interpolateViridis)
             .domain(d3.extent(data, (d) => d[colorAttribute]));
 
-        return { xScale, yScale, colorScale };
+        const transformedXScale = (x) => xScale(x) * 1.0;
+        const transformedYScale = (y) => yScale(y) * 1.0;
+
+        return { transformedXScale, transformedYScale, colorScale };
     };
 
     // Function to smooth data
@@ -93,27 +101,70 @@ const SingleDriverTrackView = ({ data, driver1, colorAttribute, tooltipRef }) =>
         return polygons;
     };
 
-    const drawPolygons = (svg, polygons, data, colorScale, colorAttribute, tooltip, tooltipRef) => {
-        polygons.forEach((polygon, i) => {
+    const drawPolygons = (svg, polygons, data, colorScale, colorAttribute, tooltip, tooltipRef, lineWidth, transformedXScale, transformedYScale) => {
+        const orderedPolygons = reverseZIndex ? [...polygons].reverse() : polygons;
+
+        const lineGenerator = d3.line()
+            .x((d) => transformedXScale(d.X))
+            .y((d) => transformedYScale(d.Y))
+            .curve(d3.curveCatmullRom);
+
+        svg.append("path")
+            .datum(data)
+            .attr("d", lineGenerator)
+            .attr("stroke", "black") // Border color
+            .attr("stroke-width", 2 * lineWidth + 6) // Slightly wider than the main line
+            .attr("fill", "none")
+            .attr("opacity", 1);
+
+        svg.append("path")
+            .datum(data)
+            .attr("d", lineGenerator)
+            .attr("stroke", "white") // Border color
+            .attr("stroke-width", 2 * lineWidth + 2) // Slightly wider than the main line
+            .attr("fill", "none")
+            .attr("opacity", 1);
+
+        orderedPolygons.forEach((polygon, i) => {
+            const dataIndex = reverseZIndex ? polygons.length - 1 - i : i;
             svg.append("polygon")
                 .attr("points", polygon.map((v) => `${v.x},${v.y}`).join(" "))
-                .attr("fill", colorScale(data[i][colorAttribute]))
+                .attr("fill", colorScale(data[dataIndex][colorAttribute]))
                 .attr("stroke", "black")
-                .attr("stroke-width", 0)
+                .attr("stroke-width", 0.1)
                 .attr("opacity", 1)
                 .on("mouseover", function (event) {
-                    d3.select(this).attr("fill", "red");
+                    d3.select(this).attr("opacity", 1).attr("stroke-width", 2);
 
-                    tooltip.style("display", "block")
-                        .html(
-                            `${colorAttribute}: ${data[i][colorAttribute]}`
-                        )
-                        .style("left", `${event.pageX + 10}px`)
-                        .style("top", `${event.pageY + 10}px`);
+                    const tooltipData = `
+                        <div class="${styles.tooltipContent}">
+                            <div class="${styles.tooltipMiddle}">
+                                <div class="${styles.distance}">
+                                    ${parseFloat(data[dataIndex]['Distance']).toFixed(2)} m (Sector ${data[dataIndex].marshal_sector})
+                                </div>
+                                <div class="${styles.attribute}">${colorAttribute}</div>
+                            </div>
+                            <div class="${styles.tooltipColumn}">
+                                 <div class="${styles.tooltipHeader}">${driver1}</div>
+                                 <div class="${styles.tooltipValue}">${data[dataIndex][colorAttribute]}</div>
+                            </div>
+                        </div>
+                    `;
+
+                    const svgRect = svgRef.current.getBoundingClientRect(); // Get SVG bounding box
+                    const tooltipX = event.clientX - svgRect.left + 30; // Adjust X position relative to SVG
+                    const tooltipY = event.clientY - svgRect.top + 30; // Adjust Y position relative to SVG
+
+
+                    d3.select(tooltipRef.current)
+                        .style("display", "block")
+                        .style("left", `${tooltipX}px`) // Use adjusted X position
+                        .style("top", `${tooltipY}px`) // Use adjusted Y position
+                        .html(tooltipData);
                 })
                 .on("mouseout", function () {
-                    d3.select(this).attr("fill", colorScale(data[i][colorAttribute]));
-                    tooltip.style("display", "none");
+                    d3.select(this).attr("opacity", 1).attr("stroke-width", 0.1);
+                    d3.select(tooltipRef.current).style("display", "none");
                 });
         });
     };
@@ -129,14 +180,33 @@ const SingleDriverTrackView = ({ data, driver1, colorAttribute, tooltipRef }) =>
 
         const smoothedData = smoothData(data.driver1);
 
-        const { xScale, yScale, colorScale } = createScales(smoothedData, width, height, colorAttribute);
+        // Correctly destructure the returned scale names
+        const { transformedXScale, transformedYScale, colorScale } = createScales(
+            smoothedData,
+            width,
+            height,
+            colorAttribute
+        );
 
-        const polygons = generatePolygons(smoothedData, xScale, yScale, lineWidth);
+        // Pass the correct scales to the generatePolygons function
+        const polygons = generatePolygons(smoothedData, transformedXScale, transformedYScale, lineWidth);
 
-        drawPolygons(svg, polygons, smoothedData, colorScale, colorAttribute, tooltip, tooltipRef);
+        drawPolygons(svg, polygons, smoothedData, colorScale, colorAttribute, tooltip, tooltipRef, lineWidth, transformedXScale, transformedYScale);
     }, [data, colorAttribute]);
 
-    return <svg ref={svgRef} width={800} height={600} />;
+    return (
+        <div style={{ position: "relative" }}>
+            <svg ref={svgRef} width={800} height={600} />
+            <div className={styles.tooltipSingle}
+                 ref={tooltipRef}
+                 style={{
+                     position: "absolute",
+                     display: "none",
+                     pointerEvents: "none",
+                 }}
+            />
+        </div>
+    );
 };
 
 export default SingleDriverTrackView;

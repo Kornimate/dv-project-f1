@@ -9,7 +9,8 @@ import {CircularProgress} from "@mui/material";
 import { YEARS, DEV_URL } from '../../shared-resources/constants';
 
 import styles from '../../styles/TrackComponent.module.css';
-import axios from "axios"; // Import the module CSS
+import axios from "axios";
+import DualDriverTrackView from "./DualDriverTrackView"; // Import the module CSS
 
 const TrackComponent = () => {
     const url = useMemo(() => (process.env.API_URL === null || process.env.API_URL === undefined ? DEV_URL : process.env.API_URL), []);
@@ -18,21 +19,27 @@ const TrackComponent = () => {
     const [colorAttribute, setColorAttribute] = useState('Speed');
     const [comparisonMode, setComparisonMode] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [reverseZIndex, setReverseZIndex] = useState(false);
+    const [showSectors, setShowSectors] = useState(true);
 
     const [races, setRaces] = useState([]);
     const [racers, setRacers] = useState([]);
 
     const [params, setParams] = useState({
-        year: '2024',
-        race: '1',
-        driver1: 'VER',
-        driver2: 'HAM',
+        year: '',
+        race: '',
+        driver1: '',
+        driver2: '',
         lap1: '',
         lap2: '',
         fastest: true,
     });
 
     const tooltipRef = useRef();
+
+    const toggleReverseZIndex = () => {
+        setReverseZIndex((prev) => !prev);
+    };
 
     useEffect(() => {
         const queryParams = new URLSearchParams(window.location.search);
@@ -61,6 +68,22 @@ const TrackComponent = () => {
     }, [params]);
 
     const updateParam = (key, value) => {
+        if (key === 'driver1') {
+            if(value !== '' && value === params.driver2){
+                alert('Choose different pilots for comparison!');
+                return;
+            }
+        }
+
+        if (key === 'driver2') {
+            if(value !== '' && value === params.driver1){
+                alert('Choose different pilots for comparison!');
+                console.log(2)
+                return;
+            }
+        }
+
+
         const updatedParams = { ...params, [key]: value, fastest: true };
         setParams(updatedParams);
 
@@ -78,13 +101,33 @@ const TrackComponent = () => {
                     year : params.year
                 }
             });
+
             console.log(response.data)
 
             setRaces(response.data)
-            //setRacesVisible(true)
         }
         getRaces();
     }, [params.year, url]);
+
+    useEffect(() => {
+        async function getRacers(){
+            if(params.year === 0 || isNaN(params.year) || params.year === '' || params.year === undefined ||
+                params.year === null || params.race === '' || params.race=== undefined || params.race === null)
+                return;
+
+            const response = await axios.get(`${url}/pilots-for-race`,{
+                params : {
+                    year : params.year,
+                    race: params.race
+                }
+            });
+
+            setRacers(response.data)
+        }
+
+        getRacers();
+
+    }, [params.year, params.race, url]);
 
     const handleColorAttributeChange = (e) => {
         setColorAttribute(e.target.value);
@@ -98,21 +141,24 @@ const TrackComponent = () => {
         setComparisonMode(prev => !prev);
     };
 
+    const toggleShowSectors = () => {
+        setShowSectors(prev => !prev);
+    };
+
     return loading ? (
         <div className={styles.appContainer}>Loading...</div>
     ) : (
         <TrackDataProvider raceInfo={{ year: params.year, circuit: params.race, session: 'R' }} driver1={params.driver1} driver2={params.driver2} lap1={params.lap1} lap2={params.lap2} fastest={params.fastest}>
             {({ data, error, loading }) => (
                 <div className={styles.appContainer}>
-                    <div
-                        ref={tooltipRef}
-                        className={`${styles.tooltip}`}
-                    ></div>
                     <div className={styles.dropdownGroupContainer}>
                         <div className={styles.dropdownContainer}>
                             <label className={styles.label}>Choose Year:</label>
                             <select className={styles.selectDropdown}
                                     onChange={(e) => updateParam('year', e.target.value)} value={params.year}>
+                                <option value="" disabled>
+                                    Select a year
+                                </option>
                                 {YEARS.map(y => (
                                     <option key={y} value={y}>
                                         {y}
@@ -122,7 +168,7 @@ const TrackComponent = () => {
                         </div>
 
                         <div className={styles.dropdownContainer}>
-                            <label className={styles.label}>Choose Year:</label>
+                        <label className={styles.label}>Choose Year:</label>
                             <select className={styles.selectDropdown}
                                     onChange={(e) => updateParam('race', e.target.value)} value={params.race || ''}>
                                 <option value="" disabled>
@@ -141,8 +187,11 @@ const TrackComponent = () => {
                             <label className={styles.label}>Choose Driver 1:</label>
                             <select className={styles.selectDropdown}
                                     onChange={(e) => updateParam('driver1', e.target.value)} value={params.driver1}>
-                                {DRIVERS2024.map(driver => (
-                                    <option key={driver.code} value={driver.code}>
+                                <option value="" disabled>
+                                    Select a driver
+                                </option>
+                                {racers.map(driver => (
+                                    <option key={driver.name} value={driver.name}>
                                         {driver.name}
                                     </option>
                                 ))}
@@ -150,11 +199,14 @@ const TrackComponent = () => {
                         </div>
 
                         <div className={styles.dropdownContainer}>
-                            <label className={styles.label}>Choose Driver 2:</label>
+                        <label className={styles.label}>Choose Driver 2:</label>
                             <select className={styles.selectDropdown}
                                     onChange={(e) => updateParam('driver2', e.target.value)} value={params.driver2}>
-                                {DRIVERS2024.map(driver => (
-                                    <option key={driver.code} value={driver.code}>
+                                <option value="" disabled>
+                                    Select a driver
+                                </option>
+                                {racers.map(driver => (
+                                    <option key={driver.name} value={driver.name}>
                                         {driver.name}
                                     </option>
                                 ))}
@@ -162,15 +214,14 @@ const TrackComponent = () => {
                         </div>
 
                         <div className={styles.dropdownContainer}>
-                            <label className={styles.label}>Choose Data:</label>
+                        <label className={styles.label}>Choose Data:</label>
                             <select className={styles.comparisonDropdown} onChange={handleColorAttributeChange}
                                     value={colorAttribute}>
                                 <option value="Speed">Speed (km/h)</option>
                                 <option value="RPM">RPM</option>
-                                <option value="nGear">Gear Number</option>
-                                <option value="Throttle">Throttle Pressure (%)</option>
-                                <option value="Brake">Brake Applied (boolean)</option>
-                                <option value="DRS">DRS Status</option>
+                                {(!showSectors || !comparisonMode) && (<option value="nGear">Gear Number</option>)}
+                                {(!showSectors || !comparisonMode) && (<option value="Throttle">Throttle Pressure (%)</option>)}
+                                {(!showSectors || !comparisonMode) && (<option value="Brake">Brake Applied</option>)}
                             </select>
                         </div>
 
@@ -183,25 +234,40 @@ const TrackComponent = () => {
                                     {comparisonMode ? 'Single Driver Mode' : 'Comparison Mode'}
                                 </button>
                             )}
+                            {viewType === 'track' && (
+                                <button className={styles.button} onClick={toggleReverseZIndex}>
+                                    Reverse Layer Stacking
+                                </button>
+                            )}
+                            {viewType === 'track' && comparisonMode && (
+                                <button className={styles.button} onClick={toggleShowSectors}>
+                                    {showSectors ? 'Hide Sectors' : 'Show Sectors'}
+                                </button>
+                            )}
                         </div>
                     </div>
-
-                    {loading ? (
-                        <CircularProgress size="3rem" color="error"/>
-                    ) : error ? (
-                        <div className={styles.error}>Error: {error}</div>
-                    ) : viewType === 'track' ? (
-                        comparisonMode ? (
-                            <ComparisonTrackView data={data} driver1={params.driver1} driver2={params.driver2}
-                                                 colorAttribute={colorAttribute} tooltipRef={tooltipRef}/>
-                        ) : (
-                            <SingleDriverTrackView data={data} driver1={params.driver1} colorAttribute={colorAttribute}
-                                                   tooltipRef={tooltipRef}/>
-                        )
-                    ) : (
-                        <LineChart data={data} driver1={params.driver1} driver2={params.driver2}
-                                   colorAttribute={colorAttribute}/>
-                    )}
+                    <div className={styles.contentContainer}>
+                        <div className={styles.chartContainer}>
+                            {loading ? (
+                                <CircularProgress size="3rem" color="error"/>
+                            ) : error ? (
+                                <div className={styles.error}>Error: {error}</div>
+                            ) : viewType === 'track' ? (
+                                comparisonMode ? (
+                                    <DualDriverTrackView data={data} driver1={params.driver1} driver2={params.driver2}
+                                                         colorAttribute={colorAttribute} tooltipRef={tooltipRef} reverseZIndex={reverseZIndex} showSectors={showSectors}/>
+                                ) : (
+                                    <SingleDriverTrackView data={data} driver1={params.driver1}
+                                                           driver2={params.driver2}
+                                                           colorAttribute={colorAttribute}
+                                                           tooltipRef={tooltipRef} reverseZIndex={reverseZIndex}/>
+                                )
+                            ) : (
+                                <LineChart data={data} driver1={params.driver1} driver2={params.driver2}
+                                           colorAttribute={colorAttribute}/>
+                            )}
+                        </div>
+                    </div>
                 </div>
             )}
         </TrackDataProvider>

@@ -1,10 +1,83 @@
 import {useEffect, useRef, useState} from "react";
 import * as d3 from "d3";
 
-const ComparisonTrackView = ({ data, driver1, driver2, colorAttribute, tooltipRef }) => {
+const ComparisonTrackView = ({ data, driver1, driver2, colorAttribute, tooltipRef, reverseZIndex }) => {
     const svgRef = useRef();
     const [viewMode, setViewMode] = useState("track");
     const [selectedSectorPoints, setSelectedSectorPoints] = useState([]);
+
+    const setupSVG = (svg, width, height) => {
+        svg.attr("viewBox", `0 0 ${width} ${height}`).style("overflow", "visible");
+        svg.selectAll("*").remove(); // Clear previous elements
+    };
+
+    const createScales = (data, width, height) => {
+        // Calculate the global extents for consistent proportions
+        const xExtent = d3.extent(data.driver1, (d) => d.X);
+        const yExtent = d3.extent(data.driver1, (d) => d.Y);
+
+        // Scales for X and Y, based on the full track proportions
+        const xScale = d3.scaleLinear()
+            .domain(xExtent)
+            .range([50, width - 50])
+            .nice()
+            .interpolate(d3.interpolateNumber);
+        const yScale = d3.scaleLinear()
+            .domain(yExtent)
+            .range([height - 50, 50])
+            .nice()
+            .interpolate(d3.interpolateNumber);
+
+        const transformedXScale = (x) => xScale(x) * 1.0;
+        const transformedYScale = (y) => yScale(y) * 1.0;
+
+        return { transformedXScale, transformedYScale };
+    };
+
+    const calculateVertices = (prev, curr, next, xScale, yScale, lineWidth) => {
+        const getPoint = (point) => point && { x: xScale(point.X), y: yScale(point.Y) };
+
+        const currPoint = getPoint(curr);
+        const prevPoint = getPoint(prev);
+        const nextPoint = getPoint(next);
+
+        const normalize = (v) => {
+            const length = Math.sqrt(v.x * v.x + v.y * v.y);
+            return { x: v.x / length, y: v.y / length };
+        };
+
+        const perpendicular = (v) => ({ x: -v.y, y: v.x });
+
+        const vectorPrev = prevPoint
+            ? { x: currPoint.x - prevPoint.x, y: currPoint.y - prevPoint.y }
+            : null;
+        const vectorNext = nextPoint
+            ? { x: nextPoint.x - currPoint.x, y: nextPoint.y - currPoint.y }
+            : null;
+
+        const normPrev = vectorPrev ? normalize(vectorPrev) : null;
+        const normNext = vectorNext ? normalize(vectorNext) : null;
+
+        let bisector;
+        if (normPrev && normNext) {
+            const perpPrev = perpendicular(normPrev);
+            const perpNext = perpendicular(normNext);
+            bisector = {
+                x: (perpPrev.x + perpNext.x) / 2,
+                y: (perpPrev.y + perpNext.y) / 2,
+            };
+            const bisectorLength = Math.sqrt(bisector.x * bisector.x + bisector.y * bisector.y);
+            bisector = { x: bisector.x / bisectorLength, y: bisector.y / bisectorLength };
+        } else {
+            bisector = normPrev ? perpendicular(normPrev) : perpendicular(normNext);
+        }
+
+        return [
+            { x: currPoint.x + bisector.x * lineWidth, y: currPoint.y + bisector.y * lineWidth },
+            { x: currPoint.x - bisector.x * lineWidth, y: currPoint.y - bisector.y * lineWidth },
+        ];
+    };
+
 
     useEffect(() => {
         const svg = d3.select(svgRef.current);
@@ -29,56 +102,6 @@ const ComparisonTrackView = ({ data, driver1, driver2, colorAttribute, tooltipRe
             .curve(d3.curveCatmullRom);
 
         const lineWidth = 10;
-
-        const calculateVertices = (prev, curr, next) => {
-            // Get scaled coordinates
-            const currPoint = { x: xScale(curr.X), y: yScale(curr.Y) };
-            const prevPoint = prev ? { x: xScale(prev.X), y: yScale(prev.Y) } : null;
-            const nextPoint = next ? { x: xScale(next.X), y: yScale(next.Y) } : null;
-
-            // Calculate direction vectors
-            const vectorPrev = prevPoint
-                ? { x: currPoint.x - prevPoint.x, y: currPoint.y - prevPoint.y }
-                : null;
-            const vectorNext = nextPoint
-                ? { x: nextPoint.x - currPoint.x, y: nextPoint.y - currPoint.y }
-                : null;
-
-            // Normalize vectors
-            const normalize = (v) => {
-                const length = Math.sqrt(v.x * v.x + v.y * v.y);
-                return { x: v.x / length, y: v.y / length };
-            };
-            const normPrev = vectorPrev ? normalize(vectorPrev) : null;
-            const normNext = vectorNext ? normalize(vectorNext) : null;
-
-            // Calculate perpendicular offsets
-            const perp = (v) => ({ x: -v.y, y: v.x });
-            const perpPrev = normPrev ? perp(normPrev) : null;
-            const perpNext = normNext ? perp(normNext) : null;
-
-            // Calculate bisector
-            let bisector;
-            if (perpPrev && perpNext) {
-                bisector = {
-                    x: (perpPrev.x + perpNext.x) / 2,
-                    y: (perpPrev.y + perpNext.y) / 2,
-                };
-
-                // Normalize bisector
-                const bisectorLength = Math.sqrt(bisector.x * bisector.x + bisector.y * bisector.y);
-                bisector = { x: bisector.x / bisectorLength, y: bisector.y / bisectorLength };
-            } else {
-                // Handle start or end cases
-                bisector = perpPrev || perpNext;
-            }
-
-            // Create polygon vertices
-            return [
-                { x: currPoint.x + bisector.x * lineWidth, y: currPoint.y + bisector.y * lineWidth },
-                { x: currPoint.x - bisector.x * lineWidth, y: currPoint.y - bisector.y * lineWidth },
-            ];
-        };
 
         const groupedData = d3.group(data.driver1, (d) => d.marshal_sector);
 
@@ -222,7 +245,6 @@ const ComparisonTrackView = ({ data, driver1, driver2, colorAttribute, tooltipRe
                 j = 0; // Pointers for driver1 and driver2
             let currentPoint = { x: selectedSectorPoints[0].X, y: selectedSectorPoints[0].Y }; // Starting point
 
-            console.log(selectedSectorPoints.length, filteredDriver2Data.length)
             const polygons = [];
             const prevPoint = null;
 

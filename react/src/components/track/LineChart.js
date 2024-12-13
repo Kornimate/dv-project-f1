@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { useEffect, useRef } from "react";
+import {useEffect, useRef} from "react";
 
 const LineChart = ({ data, driver1, driver2, colorAttribute }) => {
     const svgRef = useRef();
@@ -52,6 +52,40 @@ const LineChart = ({ data, driver1, driver2, colorAttribute }) => {
             .attr("d", line);
     };
 
+    const addLegend = (svg, driver1, driver2, colors, width, margin) => {
+        const legend = svg.append("g")
+            .attr("class", "legend")
+            .attr("transform", `translate(${margin.left}, ${margin.top - 30})`);
+
+        // Driver 1 legend
+        legend.append("rect")
+            .attr("x", width - margin.right - 150)
+            .attr("y", 0)
+            .attr("width", 15)
+            .attr("height", 15)
+            .attr("fill", colors.driver1);
+
+        legend.append("text")
+            .attr("x", width - margin.right - 130)
+            .attr("y", 12)
+            .style("font-size", "12px")
+            .text(driver1);
+
+        // Driver 2 legend
+        legend.append("rect")
+            .attr("x", width - margin.right - 150)
+            .attr("y", 20)
+            .attr("width", 15)
+            .attr("height", 15)
+            .attr("fill", colors.driver2);
+
+        legend.append("text")
+            .attr("x", width - margin.right - 130)
+            .attr("y", 32)
+            .style("font-size", "12px")
+            .text(driver2);
+    };
+
     const addZoom = (svg, scales, margin, height, line, colorAttribute) => {
         const zoomX = d3.zoom()
             .scaleExtent([1, 10])
@@ -67,47 +101,10 @@ const LineChart = ({ data, driver1, driver2, colorAttribute }) => {
                 svg.selectAll(".driver2-line").attr("d", newLine);
             });
 
-        const zoomY = d3.zoom()
-            .scaleExtent([1, 10])
-            .translateExtent([[margin.left, margin.top], [scales.width - margin.right, height - margin.bottom]])
-            .extent([[margin.left, margin.top], [scales.width - margin.right, height - margin.bottom]])
-            .on("zoom", (event) => {
-                const newYScale = event.transform.rescaleY(scales.valueScale);
 
-                svg.select(".y-axis").call(d3.axisLeft(newYScale).ticks(10));
+         // Default to x-axis zoom
+        svg.call(zoomX);
 
-                svg.selectAll(".driver1-line").attr("d", line.y(d => newYScale(d[colorAttribute])));
-                svg.selectAll(".driver2-line").attr("d", line.y(d => newYScale(d[colorAttribute])));
-            });
-
-        let currentZoom = zoomX; // Default to x-axis zoom
-
-        // Apply initial zoom
-        svg.call(currentZoom);
-
-        const handleKeyDown = (event) => {
-            if (event.key === "Shift" && currentZoom !== zoomY) {
-                currentZoom = zoomY;
-                svg.call(currentZoom);
-            }
-        };
-
-        const handleKeyUp = (event) => {
-            if (event.key === "Shift" && currentZoom !== zoomX) {
-                currentZoom = zoomX;
-                svg.call(currentZoom);
-            }
-        };
-
-        // Add event listeners for keypress
-        window.addEventListener("keydown", handleKeyDown);
-        window.addEventListener("keyup", handleKeyUp);
-
-        // Cleanup event listeners on unmount
-        return () => {
-            window.removeEventListener("keydown", handleKeyDown);
-            window.removeEventListener("keyup", handleKeyUp);
-        };
     };
 
     useEffect(() => {
@@ -130,8 +127,12 @@ const LineChart = ({ data, driver1, driver2, colorAttribute }) => {
             .y(d => valueScale(d[colorAttribute]))
             .curve(d3.curveMonotoneX);
 
-        drawLine(svg, data.driver1, line, "steelblue", "driver1-line");
-        drawLine(svg, data.driver2, line, "orange", "driver2-line");
+        const colors = { driver1: "#e66101", driver2: "#0571b0"}
+
+        drawLine(svg, data.driver1, line, colors.driver1, "driver1-line");
+        drawLine(svg, data.driver2, line, colors.driver2, "driver2-line");
+
+        addLegend(svg, driver1, driver2, colors, width, margin);
 
         // Apply zoom behavior
         const cleanupZoom = addZoom(svg, scales, margin, height, line, colorAttribute);
