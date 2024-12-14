@@ -50,6 +50,26 @@ def getStandings():
     except Exception as e:
         logging.error("Error fetching standings data: %s", str(e)) 
         return jsonify({"error": "Internal Server Error"}), 500
+    
+@app.route("/api/tire-strategy", methods=['GET'])
+def get_tire_strategy():
+    """
+    API endpoint to fetch tire strategy data for a given year, circuit, and session.
+    Parameters: year, circuit, session (query parameters)
+    """
+    try:
+        year = int(request.args.get("year"))
+        circuit = int(request.args.get("race"))
+        session = request.args.get("session")
+        
+        if not year or not circuit or not session:
+            return jsonify({"error": "Missing required parameters"}), 400
+        
+        tire_strategy = service.getTireStrategyData2(year, circuit, session)
+        return jsonify({"success": True, "tire_strategy": tire_strategy})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route("/api/calendar-year-races", methods=['GET'])
 def getRaces():

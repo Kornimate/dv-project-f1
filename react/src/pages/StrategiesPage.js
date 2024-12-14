@@ -1,8 +1,9 @@
+import TireVisSelect from "../components/TireVisSelect";
 
 const StrategiesPage = () => {
     return (
         <div>
-            {/* Strategies component comes here */}
+            <TireVisSelect />
         </div>
     )
 }
