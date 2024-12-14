@@ -3,6 +3,7 @@ from flask_cors import CORS, cross_origin
 import service
 import os
 import json
+import logging
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -32,14 +33,23 @@ def index():
     except:
         return Response(ERROR_RESPONSE, status=500, mimetype='application/json')
 
-#Example method for getting data from the server
-@app.route("/api/f1-race-results",methods=['GET'])
-def getData():
+@app.route('/api/f1-standings', methods=['GET'])
+def getStandings():
+    year = request.args.get("year")
+    race = request.args.get("race")
+    session = request.args.get("session")
+
+    print("Year:", year, "Race:", race, "Session:", session)
+    
+    if not year or not race or not session:
+        return jsonify({"error": "Missing required parameters"}), 400
+
     try:
-        response = service.getSessionData(int(request.args["year"]), request.args["circuit"],request.args["session"])
-        return jsonify(response.to_json(orient = "records"))
-    except:
-        return Response(ERROR_RESPONSE, status=500, mimetype='application/json')
+        response = service.getStandingsData(int(year), int(race), session)
+        return jsonify(response), 200
+    except Exception as e:
+        logging.error("Error fetching standings data: %s", str(e)) 
+        return jsonify({"error": "Internal Server Error"}), 500
 
 @app.route("/api/calendar-year-races", methods=['GET'])
 def getRaces():

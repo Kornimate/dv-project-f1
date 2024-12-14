@@ -1,12 +1,110 @@
 import fastf1
-from fastf1 import plotting, events
 import json
+import logging
+import pandas as pd
+import os
+import fastf1.plotting as plotting
 
-def getSessionData(year, circuit, session):
-    session = fastf1.get_session(year, circuit, session)
-    res = session.load(telemetry=False, laps=False, weather=False)
+def getStandingsData(year, circuit, session_type):
+    """
+    Fetch and return the standings data for a given F1 race session.
+    Includes debugging to verify race selection and data loading.
 
-    return session.results
+    Args:
+        year (int): The year of the race season.
+        circuit (str): The circuit name or event name.
+        session_type (str): The session type ('R' for Race, 'Q' for Qualifying, etc.).
+
+    Returns:
+        list: A list of standings data for each lap and final results.
+    """
+    logging.info("Fetching standings data for Year: %d, Circuit: %s, Session: %s", year, circuit, session_type)
+    print(f"Input Parameters - Year: {year}, Circuit: {circuit}, Session: {session_type}")
+    
+    try:
+        # Load the session
+        session = fastf1.get_session(year, circuit, session_type)
+        print(f"Loaded Event: {session.event['EventName']}, Date: {session.date}")
+        session.load(telemetry=False, laps=True, weather=False)
+        logging.info("Data loaded successfully.")
+    except Exception as e:
+        logging.error("Error loading session data: %s", str(e))
+        raise
+
+    standings = []
+    processed_laps = set()
+
+    # Debug: Check if laps are available
+    if session.laps.empty:
+        logging.warning("No lap data available for the session.")
+        print(f"No lap data available for {year} {circuit} ({session_type}).")
+        return standings
+
+    # Debug: Calculate and print total laps
+    total_laps = session.laps['LapNumber'].max()
+    print(f"Total laps for {year} {circuit} ({session_type}): {total_laps}")
+
+    # Retrieve all drivers
+    all_drivers = session.laps['Driver'].unique()
+
+    # Grid positions from results
+    grid_positions = {
+        result.Abbreviation: result.GridPosition
+        for result in session.results.itertuples()
+    }
+
+    # Add initial grid positions to standings
+    lap_data_dict = {"lap": 0}
+    for driver_id in all_drivers:
+        team_name = session.results.loc[session.results['Abbreviation'] == driver_id, 'TeamName'].values[0]
+        lap_data_dict[driver_id] = {
+            "position": grid_positions.get(driver_id, None),
+            "team": team_name
+        }
+    standings.append(lap_data_dict)
+
+    # Process lap data
+    for lap_index, lap_data in session.laps.iterrows():
+        lap_number = lap_data['LapNumber']
+        
+        if lap_number in processed_laps:
+            continue
+
+        processed_laps.add(lap_number)
+        lap_data_dict = {"lap": lap_number}
+        lap_standings = session.laps[session.laps['LapNumber'] == lap_number]
+        
+        for driver_id in all_drivers:
+            try:
+                driver_position = lap_standings.loc[lap_standings['Driver'] == driver_id, 'Position'].values
+                driver_team = lap_standings.loc[lap_standings['Driver'] == driver_id, 'Team'].values
+
+                lap_data_dict[driver_id] = {
+                    "position": driver_position[0] if len(driver_position) > 0 and not pd.isna(driver_position[0]) else None,
+                    "team": driver_team[0] if len(driver_team) > 0 and not pd.isna(driver_team[0]) else None
+                }
+            except Exception as e:
+                logging.warning("Error fetching data for driver %s in lap %d: %s", driver_id, lap_number, str(e))
+                lap_data_dict[driver_id] = {"position": None, "team": None}
+
+        standings.append(lap_data_dict)
+    
+    # Add final standings
+    final_standings = {"lap": "Final Results"}
+    for result in session.results.itertuples():
+        driver = getattr(result, 'Abbreviation', None)
+        position = getattr(result, 'Position', None)
+        team = getattr(result, 'TeamName', None)
+
+        if driver:
+            final_standings[driver] = {
+                "position": position,
+                "team": team
+            }
+
+    standings.append(final_standings)
+    logging.info("Standings data prepared successfully.")
+    return standings
 
 def getRaceLapTimesForDrivers(year, race_number, racer_1, racer_2):
     race = fastf1.get_session(year, race_number, 'R')
@@ -39,9 +137,3 @@ def getRacesForYear(year):
     data = fastf1.get_event_schedule(year)
     return list(data.query("EventFormat != 'testing'")['EventName'])
 
-
-print(getRaceLapTimesForDrivers(2024, "Monza", "OCO", "GAS"))
-# print(getDriversForRace(2021, 1))
-# print(getYearRaces(2021))
-
-# print(getRaceLapTimesForDrivers(2021, 1, "GAS", "TSU"))

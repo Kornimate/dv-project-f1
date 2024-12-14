@@ -1,8 +1,9 @@
+import LapStandings from "../components/LapStandings";
 
 const RaceResultsPage = () => {
     return (
         <div>
-            {/* Race results component comes here */}
+            <LapStandings />
         </div>
     )
 }
