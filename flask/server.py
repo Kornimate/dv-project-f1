@@ -71,6 +71,31 @@ def get_tire_strategy():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
+@app.route("/api/f1-fastest-lap", methods=['GET'])
+def get_fastest_lap():
+    try:
+        response = service.get_fastest_lap(int(request.args["year"]), int(request.args["circuit"]), request.args["session"], request.args["driver"])
+        return jsonify(response.to_json(orient = "records"))
+    except:
+        return Response(ERROR_RESPONSE, status=500, mimetype='application/json')
+
+@app.route("/api/f1-lap", methods=['GET'])
+def get_lap():
+    try:
+        response = service.get_lap(int(request.args["year"]), int(request.args["circuit"]), request.args["session"], request.args["driver"], int(request.args["lap"]))
+        return jsonify(response.to_json(orient = "records"))
+    except:
+        return Response(ERROR_RESPONSE, status=500, mimetype='application/json')
+
+
+@app.route("/api/track-info", methods=['GET'])
+def get_track_info():
+    try:
+        response = service.get_track_info(int(request.args["year"]), int(request.args["circuit"]), request.args["session"])
+        return jsonify(response.to_json(orient = "records"))
+    except:
+        return Response(ERROR_RESPONSE, status=500, mimetype='application/json')
+
 @app.route("/api/calendar-year-races", methods=['GET'])
 def getRaces():
     try:

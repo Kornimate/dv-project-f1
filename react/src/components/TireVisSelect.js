@@ -109,7 +109,7 @@ const TireVisSelect = () => {
                     }
                     </Select>
                 </FormControl>
-                { racesVisible && <FormControl  fullWidth sx={{marginTop: '2%'}}>
+                { racesVisible && <FormControl  fullWidth sx={{marginTop: '2%', marginBottom: '2%'}}>
                     <InputLabel id="raceLabel">Race</InputLabel>
                     <Select
                         labelId="raceLabel"

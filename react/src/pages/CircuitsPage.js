@@ -1,8 +1,9 @@
+import TrackComponent from "../components/track/TrackComponent";
 
 const CircuitsPage = () => {
     return (
         <div>
-            {/* Circuits component comes here */}
+            <TrackComponent />
         </div>
     )
 }

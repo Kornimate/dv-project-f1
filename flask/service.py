@@ -130,6 +130,27 @@ def getTireStrategyData2(year, circuit, session_type):
 
     return stints_by_driver_list
 
+def get_lap(year, circuit, session, driver, lap):
+    session = fastf1.get_session(year, circuit, session)
+    session.load(weather=False)
+    data = session.laps.pick_drivers(driver).pick_laps(lap).get_telemetry()
+    data.add_distance()
+    return data
+
+def get_fastest_lap(year, circuit, session, driver):
+    session = fastf1.get_session(year, circuit, session)
+    session.load(weather=False)
+    data = session.laps.pick_drivers(driver).pick_fastest().get_telemetry()
+    data.add_distance()
+    return data
+
+def get_track_info(year, circuit, session):
+    session = fastf1.get_session(year, circuit, session)
+    print(year, circuit, session)
+    session.load(weather=False)
+    data = session.get_circuit_info().marshal_sectors
+    return data
+
 def getRaceLapTimesForDrivers(year, race_number, racer_1, racer_2):
     race = fastf1.get_session(year, race_number, 'R')
     race.load(telemetry=False, laps=True, weather=False)
