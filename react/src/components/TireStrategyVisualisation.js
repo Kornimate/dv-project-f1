@@ -273,7 +273,7 @@ const TireStrategyVisualization = ({ year, race}) => {
 
   return (
     loading ? 
-    <CircularProgress />
+    <CircularProgress color="error" />
     :
     <div className="chart-container">
       <svg ref={svgRef}></svg>

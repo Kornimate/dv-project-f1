@@ -210,7 +210,7 @@ const RaceStandings = ({ year, race}) => {
         <div style={{ marginTop: "20px" }} className="d-flex">
             {error && <div style={{ color: "red" }}>{error}</div>}
             {loading ? (
-                <CircularProgress />
+                <CircularProgress color="error" />
             ) : (
                 <svg id="race-standings-chart" ></svg>
             )}
