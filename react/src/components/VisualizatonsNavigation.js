@@ -27,7 +27,7 @@ const VisualizationsNavigation = ({year, race, r1, r2, l1, l2}) => {
     return (
         <div className={styles.divStyle}>
         <Button onClick={navigateToResults}>Results</Button>
-        <Button onClick={navigateToCircuits}>Circuits</Button>
+        <Button onClick={navigateToCircuits}>Track Telemetry</Button>
         <Button onClick={navigateToStrategies}>Strategies</Button>
     </div>
     )

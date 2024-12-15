@@ -29,7 +29,7 @@ const LapTimesGraph = ({year, race, l1, l2, r1, r2, c1, c2}) => {
         if(l1.length === 0 || l2.length === 0)
             return;
         
-        const margin = { top: 20, right: 30, bottom: 30, left: 50 };
+        const margin = { top: 20, right: 50, bottom: 30, left: 50 };
         const width = 700 - margin.left - margin.right;
         const height = 400 - margin.top - margin.bottom;
         const offset = 1;
