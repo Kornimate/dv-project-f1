@@ -9,7 +9,7 @@ const HomeMenu = () => {
     return (
         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', margin: "10px", height: '100%'}}>
             <HomeMenuItem url="/viz/results" title="Races" img={raceImage} />
-            <HomeMenuItem url="/viz/circuits" title="Circuits" img={circuitImage} />
+            <HomeMenuItem url="/viz/circuits" title="Track Telemetry" img={circuitImage} />
             <HomeMenuItem url="/viz/laptimes" title="Lap times" img={lapTimeImage} />
             <HomeMenuItem url="/viz/strategies" title="Strategies" img={strategyImage} />
         </Box>

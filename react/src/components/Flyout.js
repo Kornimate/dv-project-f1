@@ -33,7 +33,7 @@ const Flyout = () => {
                     <List>
                         <FlyoutItem text="Home" url="/" icon={<HomeIcon sx={{width: '11vh', height: '11vh', color: 'black'}}/>} />
                         <FlyoutItem text="Results" url="/viz/results" img={raceImage} />
-                        <FlyoutItem text="Circuits" url="/viz/circuits" img={circuitImage} />
+                        <FlyoutItem text="Track Telemetry" url="/viz/circuits" img={circuitImage} />
                         <FlyoutItem text="Lap times" url="/viz/laptimes" img={lapTimeImage} />
                         <FlyoutItem text="Strategies" url="/viz/strategies" img={strategyImage} />
                     </List>

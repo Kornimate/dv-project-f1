@@ -23,7 +23,7 @@ const HomeMenuItem = ({url, title, img}) => {
             />
             <Divider />
             <CardContent sx={{alignContent: 'center'}}>
-                <Typography gutterBottom variant="h5" component="div" sx={{ textDecoration: 'none' }}>
+                <Typography gutterBottom variant="h6" component="div" sx={{ textDecoration: 'none' }}>
                     {title}
                 </Typography>
             </CardContent>
