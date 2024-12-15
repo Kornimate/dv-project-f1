@@ -171,9 +171,9 @@ const LapTimesGraph = ({year, race, l1, l2, r1, r2, c1, c2}) => {
         .on("mouseover", (event, d) => {
             if(!activeTooltip2){
                 tooltip.style("display", "block")
-                       .html(`${r1}<br>Lap Time: ${formatTime(d.lapTime)}`);
+                       .html(`${r1}<br>Lap Time: ${formatTime(d.lapTime)}<br>Lap: ${d.lapNumber}`);
             } else {
-                tooltip.html(toolTipRef.innerHTML + `<br>${r2}<br>Lap Time: ${formatTime(d.lapTime)}`);
+                tooltip.html(toolTipRef.innerHTML + `<br>${r2}<br>Lap Time: ${formatTime(d.lapTime)}<br>Lap: ${d.lapNumber}`);
             }
             
             activeTooltip1 = true;
@@ -214,9 +214,9 @@ const LapTimesGraph = ({year, race, l1, l2, r1, r2, c1, c2}) => {
         .on("mouseover", (event, d) => {
             if(!activeTooltip1){
                 tooltip.style("display", "block")
-                       .html(`${r2}<br>Lap Time: ${formatTime(d.lapTime)}`);
+                       .html(`${r2}<br>Lap Time: ${formatTime(d.lapTime)}<br>Lap: ${d.lapNumber}`);
             } else {
-                tooltip.html(toolTipRef.innerHTML + `<br>${r2}<br>Lap Time: ${formatTime(d.lapTime)}`);
+                tooltip.html(toolTipRef.innerHTML + `<br>${r2}<br>Lap Time: ${formatTime(d.lapTime)}<br>Lap: ${d.lapNumber}`);
             }
 
             activeTooltip2 = true;

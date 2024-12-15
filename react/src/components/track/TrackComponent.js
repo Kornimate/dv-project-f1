@@ -91,6 +91,10 @@ const TrackComponent = () => {
         getRaces();
     }, [params.year, url]);
 
+    useEffect(() => {
+        console.log(params)
+    }, [params])
+
     const handleColorAttributeChange = (e) => {
         setColorAttribute(e.target.value);
     };
@@ -110,6 +114,7 @@ const TrackComponent = () => {
     return loading ? (
         <div className={styles.appContainer}>Loading...</div>
     ) : (
+        <>
         <TrackDataProvider raceInfo={{ year: params.year, circuit: params.race, session: 'R' }} driver1={params.driver1} driver2={params.driver2} lap1={params.lap1} lap2={params.lap2} fastest={params.fastest}>
             {({ data, error, loading }) => (
                 <div className={styles.appContainer}>
@@ -201,6 +206,8 @@ const TrackComponent = () => {
                     </div>
                     <div className={styles.contentContainer}>
                         <div className={styles.chartContainer}>
+                            {params.driver1 && params.driver2 && params.lap1 && params.lap2 && 
+                            <h2>{params.driver1} lap {params.lap1} VS {params.driver2} lap {params.lap2}</h2>}
                             {loading ? (
                                 <CircularProgress size="3rem" color="error"/>
                             ) : error ? (
@@ -217,13 +224,14 @@ const TrackComponent = () => {
                                 )
                             ) : (
                                 <LineChart data={data} driver1={params.driver1} driver2={params.driver2}
-                                           colorAttribute={colorAttribute} tooltipRef={tooltipRef}/>
+                                colorAttribute={colorAttribute} tooltipRef={tooltipRef}/>
                             )}
                         </div>
                     </div>
                 </div>
             )}
         </TrackDataProvider>
+        </>
     );
 };
 

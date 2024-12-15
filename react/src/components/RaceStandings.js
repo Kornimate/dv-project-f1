@@ -3,6 +3,7 @@ import axios from 'axios';
 import { DEV_URL } from "../shared-resources/constants.js";
 import * as d3 from "d3";
 import CircularProgress from '@mui/material/CircularProgress';
+import '../styles/RaceStandings.css';
 
 const teamColors = {
     "Ferrari": "#FF4C4C",            // Brightened Red
@@ -86,7 +87,7 @@ const RaceStandings = ({ year, race}) => {
     };
 
     const drawChart = (driversData) => {
-    const svgWidth = 800, svgHeight = 400, margin = { top: 60, right: 30, bottom: 20, left: 50 };
+    const svgWidth = 800, svgHeight = 400, margin = { top: 60, right: 30, bottom: 20, left: 30 };
     const width = svgWidth - margin.left - margin.right;
     const height = svgHeight - margin.top - margin.bottom;
 
@@ -206,7 +207,7 @@ const RaceStandings = ({ year, race}) => {
 };
 
     return (
-        <div style={{ marginTop: "20px" }}>
+        <div style={{ marginTop: "20px" }} className="d-flex">
             {error && <div style={{ color: "red" }}>{error}</div>}
             {loading ? (
                 <CircularProgress />

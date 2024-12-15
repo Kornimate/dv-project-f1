@@ -100,8 +100,8 @@ const TireStrategyVisualization = ({ year, race}) => {
   useEffect(() => {
     if (tireData.length === 0) return;
 
-    const margin = { top: 20, right: 50, bottom: 50, left: 200 };
-    const containerWidth = Math.min(document.documentElement.clientWidth * 0.9, 1200);
+    const margin = { top: 20, right: 50, bottom: 50, left: 100 };
+    const containerWidth = Math.min(document.documentElement.clientWidth * 0.6, 900);
     const viewportHeight = window.innerHeight;
     const maxBarHeight = 30;
     const minBarHeight = 20;
@@ -275,7 +275,7 @@ const TireStrategyVisualization = ({ year, race}) => {
     loading ? 
     <CircularProgress />
     :
-    <div className="chart-container" style={{ position: "relative" }}>
+    <div className="chart-container">
       <svg ref={svgRef}></svg>
       <div
         id="tooltip"

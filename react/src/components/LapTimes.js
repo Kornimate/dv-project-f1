@@ -144,7 +144,7 @@ const LapTimes = () => {
 
     return (
         <Box sx={{width: '100%', display: 'flex', justifyContent: 'center'}}>
-            <Box sx={{ width: '50%', maxWidth: "700px"}}>
+            <Box sx={{ width: '100%', maxWidth: "900px"}}>
                 <FormControl fullWidth sx={{marginTop: '5%'}}>
                     <InputLabel id="yearLabel">Year</InputLabel>
                     <Select
